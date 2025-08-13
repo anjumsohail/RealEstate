@@ -25,17 +25,17 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
      * @var array<int, string>
      */
+        protected $fillable = [
+        'user_type', 'name', 'email', 'mobile', 'password',
+        'address', 'profile_photo', 'landline', 'whatsapp'
+    ];
+
     protected $hidden = [
         'password',
         'remember_token',
@@ -64,4 +64,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+        public function businessProfile() {
+        return $this->hasOne(BusinessUser::class);
+    }
+
+    public function properties() {
+        return $this->hasMany(PropertyAdvertisement::class);
+    }
+    
 }
