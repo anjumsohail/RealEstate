@@ -18,9 +18,9 @@ class UserController extends Controller
     {
         $query = User::with(['businessProfile', 'properties']);
         if (Auth::user()->role !== 'Admin') {
-            $query->where('id', Auth::id());
+            $user = User::with(['businessProfile', 'properties'])->findOrFail(Auth::id());
         }
-        return UserResource::collection($query->get());
+       return view('pages.user', compact('user'));
     }
 
     public function store(StoreUserRequest $request)

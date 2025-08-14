@@ -12,6 +12,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
     public string $name = '';
     public string $email = '';
     public string $password = '';
+    public string $mobile = '';
     public string $password_confirmation = '';
 
     /**
@@ -22,7 +23,8 @@ new #[Layout('components.layouts.auth')] class extends Component {
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+            'mobile' => ['required', 'regex:/^92\d{10}$/', 'unique:' . User::class], 
+           'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
@@ -63,6 +65,18 @@ new #[Layout('components.layouts.auth')] class extends Component {
             placeholder="email@example.com"
         />
 
+        <!-- Mobile Number -->
+                <flux:input
+                    wire:model="mobile"
+                    :label="__('Mobile Number')"
+                    type="tel"
+                    required
+                    autocomplete="tel"
+                    :placeholder="__('923001234567')"
+                    pattern="^92\d{10}$" 
+                    title="Enter a valid Pakistani mobile number (e.g., 923001234567)"
+                    inputmode="numeric" 
+                />
         <!-- Password -->
         <flux:input
             wire:model="password"

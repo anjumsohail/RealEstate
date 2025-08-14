@@ -25,7 +25,7 @@ class StoreUserRequest extends FormRequest
             'user_type' => 'required|in:Individual,Business',
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'mobile' => 'required|string|max:20|unique:users,mobile',
+            'mobile' => 'required|regex:/^92\d{10}$/|unique:users,mobile',
             'password' => 'required|string|min:6',
             'address' => 'nullable|string',
             'profile_photo' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',

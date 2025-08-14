@@ -18,4 +18,8 @@ class Sector extends Model
     {
         return $this->hasMany(Block::class);
     }
+    public function propertyAdvertisements()
+{
+    return $this->hasMany(PropertyAdvertisement::class);
+}
 }

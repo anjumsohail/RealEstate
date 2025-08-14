@@ -1,34 +1,71 @@
-# Laravel + Livewire Starter Kit
+# Pins.pk - Pakistan Real Estate Portal
 
-## Introduction
+![Pins.pk Screenshot] <!-- Add actual screenshot later -->
 
-Our Laravel + [Livewire](https://livewire.laravel.com) starter kit provides a robust, modern starting point for building Laravel applications with a Livewire frontend.
+A comprehensive Laravel-based real estate platform connecting buyers, sellers, and renters across Pakistan.
 
-Livewire is a powerful way of building dynamic, reactive, frontend UIs using just PHP. It's a great fit for teams that primarily use Blade templates and are looking for a simpler alternative to JavaScript-driven SPA frameworks like React and Vue.
+## Key Features
 
-This Livewire starter kit utilizes Livewire 3, Laravel Volt (optionally), TypeScript, Tailwind, and the [Flux UI](https://fluxui.dev) component library.
+### Property Management
 
-If you are looking for the alternate configurations of this starter kit, they can be found in the following branches:
+-   🏠 Multi-type property listings (Homes, Plots, Commercial)
+-   📸 High-quality image galleries with zoom functionality
+-   🗺️ Integrated Google Maps for property locations
+-   🔍 Advanced search filters (Price, Location, Beds/Baths, Area)
+-   📈 Price trend visualization for neighborhoods
 
--   [components](https://github.com/laravel/livewire-starter-kit/tree/components) - if Volt is not selected
--   [workos](https://github.com/laravel/livewire-starter-kit/tree/workos) - if WorkOS is selected for authentication
+### User System
 
-## Official Documentation
+-   👤 Role-based accounts (Buyers, Sellers, Agents)
+-   🔐 Secure authentication with email verification
+-   💼 Agent profile pages with portfolio display
+-   ❤️ Favorite property saving system
 
-Documentation for all Laravel starter kits can be found on the [Laravel website](https://laravel.com/docs/starter-kits).
+### Transactions & Communication
 
-## Contributing
+-   💬 Built-in messaging system
+-   📅 Appointment scheduling for viewings
+-   ⚖️ Property comparison tool
+-   📱 SMS/Email notifications for important updates
 
-Thank you for considering contributing to our starter kit! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Business Features
 
-## Code of Conduct
+-   🏢 Agency management dashboard
+-   📊 Analytics for property performance
+-   💰 Commission calculation system
+-   📑 Digital contract templates
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Technology Stack
 
-## License
+### Backend
 
-The Laravel + Livewire starter kit is open-sourced software licensed under the MIT license.
+-   **Framework**: Laravel 12+
+-   **Database**: MySQL
+-   **Search**: Laravel Scout with Algolia/Meilisearch
+-   **Payments**: Stripe/JazzCash integration
+-   **API**: RESTful endpoints for mobile apps
 
-# RealEstate
+### Frontend
 
-PinsPk RealEstate
+-   **CSS**: BootStrap 5
+-   **JavaScript**: Liverwire
+-   **Maps**: Google Maps API
+-   **Media**: Image optimization with Intervention Image
+
+## Installation
+
+1. Clone repository:
+   bash
+   git clone https://github.com/yourrepo/pins-pk.git
+   composer install
+   npm install
+   cp .env.example .env
+   php artisan key:generate
+   php artisan migrate --seed
+
+### Required environment variables:
+
+GOOGLE_MAPS_API_KEY=your_key_here
+SMS_API_KEY=your_sms_provider_key
+MAIL_DRIVER=smtp
+STRIPE_KEY=your_stripe_key

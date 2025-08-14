@@ -13,4 +13,8 @@ class Block extends Model
     {
         return $this->belongsTo(Sector::class);
     }
+    public function propertyAdvertisements()
+{
+    return $this->hasMany(PropertyAdvertisement::class);
+}
 }

@@ -7,10 +7,11 @@ use App\Http\Controllers\CityController;
 use App\Http\Controllers\TownController;
 use App\Http\Controllers\SectorController;
 use App\Http\Controllers\BlockController;
-
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
-    return view('welcome');
+    //return view('welcome');
+    return view('pages.index');
 })->name('home');
 
 Route::get('/pages', function () {
@@ -28,6 +29,7 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/password', 'settings.password')->name('settings.password');
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
     // ✅ Create a new property advertisement - only for authenticated users
+
     Route::get('/property-advertisements', [PropertyAdvertisementController::class, 'index'])
         ->name('property-advertisements.index');
 
@@ -38,6 +40,9 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('towns', TownController::class)->only(['index','show','store','update','destroy']);
         Route::resource('sectors', SectorController::class)->only(['index','show','store','update','destroy']);
         Route::resource('blocks', BlockController::class)->only(['index','show','store','update','destroy']);
+
+        Route::get('/user/view', [UserController::class, 'index'])
+        ->name('profile.view');
 
 
 
@@ -55,6 +60,6 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        return view('pages.index');
     })->name('dashboard');
 });

@@ -13,4 +13,8 @@ class City extends Model
     {
         return $this->hasMany(Town::class);
     }
+    public function propertyAdvertisements()
+{
+    return $this->hasMany(PropertyAdvertisement::class);
+}
 }

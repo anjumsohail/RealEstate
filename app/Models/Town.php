@@ -18,4 +18,9 @@ class Town extends Model
     {
         return $this->hasMany(Sector::class);
     }
+    public function propertyAdvertisements()
+{
+    return $this->hasMany(PropertyAdvertisement::class);
+}
+
 }
