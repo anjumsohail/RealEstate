@@ -458,10 +458,10 @@
     border-right: none;
 }
 
-.list-inline>li {
-     display:inline-block;
-     padding-right: 5px;
-     padding-left: 5px
+.list-inline > li {
+    display: inline-block;
+    padding-right: 5px;
+    padding-left: 5px;
 }
 
 .boxes {
@@ -471,17 +471,206 @@
     margin-bottom: 30px;
     border: 1px solid #f0f0f0;
     background: #fff;
-    -moz-box-box-shadow: 2px 2px 1px RGBa(0,0,0,.035);
-    -webkit-box-shadow: 2px 2px 1px RGBa(0,0,0,.035);
-    box-shadow: -3px 3px 5px 0 rgba(0,0,0,.25)
+    -moz-box-box-shadow: 2px 2px 1px RGBa(0, 0, 0, 0.035);
+    -webkit-box-shadow: 2px 2px 1px RGBa(0, 0, 0, 0.035);
+    box-shadow: -3px 3px 5px 0 rgba(0, 0, 0, 0.25);
 }
 
 .btn-system.border-btn.btn-green {
     background-color: transparent;
     border: 1px solid #00877a;
     color: #00877a;
-    box-shadow: 0 4px 0 rgba(0,135,122,.7) inset;
-    -o-box-shadow: 0 4px 0 rgba(0,135,122,.7) inset;
-    -moz-box-shadow: 0 4px 0 rgba(0,135,122,.7) inset;
-    -webkit-box-shadow: 0 4px 0 rgba(0,135,122,.5) inset
+    box-shadow: 0 4px 0 rgba(0, 135, 122, 0.7) inset;
+    -o-box-shadow: 0 4px 0 rgba(0, 135, 122, 0.7) inset;
+    -moz-box-shadow: 0 4px 0 rgba(0, 135, 122, 0.7) inset;
+    -webkit-box-shadow: 0 4px 0 rgba(0, 135, 122, 0.5) inset;
+}
+.boxes {
+    padding: 10px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 30px;
+    border: 1px solid #f0f0f0;
+    background: #fff;
+    -moz-box-box-shadow: 2px 2px 1px RGBa(0, 0, 0, 0.035);
+    -webkit-box-shadow: 2px 2px 1px RGBa(0, 0, 0, 0.035);
+    box-shadow: -3px 3px 5px 0 rgba(0, 0, 0, 0.25);
+}
+.mid_title {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 30px;
+    margin: 10px 0;
+    border-bottom: 1px solid #efefef;
+}
+
+.generalwrapper,
+.secondwrapper {
+    background: #faf8f9;
+    padding: 10px 0;
+    position: relative;
+}
+
+.post-wrapper-top {
+    background-color: #f2f2f2;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 0;
+    border-bottom: 3px solid #f9f9f9;
+    margin-bottom: 0;
+    padding-top: 10px;
+    position: relative;
+}
+body {
+    font-family: "Open Sans", sans-serif;
+    font-size: 13px;
+    line-height: 21px;
+    position: relative;
+    color: #656565;
+    padding: 0;
+    margin: 0;
+    padding-top: 0;
+}
+
+.nav {
+    padding-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+}
+
+.nav > li {
+    position: relative;
+    display: block;
+}
+
+.nav > li > a {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+}
+
+.nav > li > a:focus,
+.nav > li > a:hover {
+    text-decoration: none;
+    background-color: #eee;
+}
+
+.nav > li.disabled > a {
+    color: #777;
+}
+
+.nav > li.disabled > a:focus,
+.nav > li.disabled > a:hover {
+    color: #777;
+    text-decoration: none;
+    cursor: not-allowed;
+    background-color: transparent;
+}
+
+.nav .open > a,
+.nav .open > a:focus,
+.nav .open > a:hover {
+    background-color: #eee;
+    border-color: #337ab7;
+}
+
+.nav .nav-divider {
+    height: 1px;
+    margin: 9px 0;
+    overflow: hidden;
+    background-color: #e5e5e5;
+}
+
+.nav > li > a > img {
+    max-width: none;
+}
+
+.nav-tabs {
+    border-bottom: 1px solid #ddd;
+}
+
+.nav-tabs > li {
+    float: left;
+    margin-bottom: -1px;
+}
+
+.nav-tabs > li > a {
+    margin-right: 2px;
+    line-height: 1.42857143;
+    border: 1px solid transparent;
+    border-radius: 4px 4px 0 0;
+}
+
+.nav-tabs > li > a:hover {
+    border-color: #eee #eee #ddd;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:focus,
+.nav-tabs > li.active > a:hover {
+    color: #555;
+    cursor: default;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-bottom-color: transparent;
+}
+
+.nav-tabs.nav-justified {
+    width: 100%;
+    border-bottom: 0;
+}
+
+.nav-tabs.nav-justified > li {
+    float: none;
+}
+
+.nav-tabs.nav-justified > li > a {
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.nav-tabs.nav-justified > .dropdown .dropdown-menu {
+    top: auto;
+    left: auto;
+}
+.tab-content > .tab-pane {
+    display: none;
+}
+
+.tab-content > .active {
+    display: block;
+}
+
+.nav-tabs .dropdown-menu {
+    margin-top: -1px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.tabbed_widget {
+    background: #fff;
+    border-left: 1px solid #efefef;
+    border-right: 1px solid #efefef;
+    border-bottom: 1px solid #efefef;
+    padding: 20px 0 0;
+}
+.hr1 {
+    height: 1px;
+}
+
+.hr2 {
+    height: 0;
+    border-bottom: 1px solid #eee;
+}
+
+.hr3 {
+    height: 0;
+    border-bottom: 1px dotted #eee;
+}
+
+.hr4 {
+    height: 0;
+    border-bottom: 1px dashed #eee;
 }

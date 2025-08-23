@@ -9,6 +9,19 @@
 
 <link rel="preconnect" href="https://fonts.bunny.net">
 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+<style>
+    .boxes {
+        padding: 10px;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 30px;
+        border: 1px solid #f0f0f0;
+        background: #fff;
+        -moz-box-box-shadow: 2px 2px 1px RGBa(0, 0, 0, 0.035);
+        -webkit-box-shadow: 2px 2px 1px RGBa(0, 0, 0, 0.035);
+        box-shadow: -3px 3px 5px 0 rgba(0, 0, 0, 0.25);
+    }
+</style>
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 @fluxAppearance

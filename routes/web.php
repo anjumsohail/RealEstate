@@ -8,6 +8,9 @@ use App\Http\Controllers\TownController;
 use App\Http\Controllers\SectorController;
 use App\Http\Controllers\BlockController;
 use App\Http\Controllers\UserController;
+use App\Http\Requests\StorePropertyRequest;
+use Illuminate\Http\Request;
+
 
 Route::get('/', function () {
     //return view('welcome');
@@ -30,19 +33,26 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
     // ✅ Create a new property advertisement - only for authenticated users
 
-    Route::get('/property-advertisements', [PropertyAdvertisementController::class, 'index'])
-        ->name('property-advertisements.index');
+      Route::post('/property-advertisements/store', [PropertyAdvertisementController::class, 'store'])->name('property-advertisements.store');
+     //Route::post('/property-advertisements/store', function(StorePropertyRequest $request){dd($request->all());})->name('property-advertisements.store');
 
-    Route::post('/property-advertisements', [PropertyAdvertisementController::class, 'store'])
-        ->name('property-advertisements.store');
+    Route::get('/property-advertisements/index', [PropertyAdvertisementController::class, 'index'])
+        ->name('property-advertisements.index');
+ 
 
         Route::resource('cities', CityController::class)->only(['index','show','store','update','destroy']);
         Route::resource('towns', TownController::class)->only(['index','show','store','update','destroy']);
         Route::resource('sectors', SectorController::class)->only(['index','show','store','update','destroy']);
         Route::resource('blocks', BlockController::class)->only(['index','show','store','update','destroy']);
 
-        Route::get('/user/view', [UserController::class, 'index'])
-        ->name('profile.view');
+        Route::get('/user/view', [UserController::class, 'index'])->name('profile.view');
+        Route::get('/user/properties', [UserController::class, 'UserProperties'])->name('property.myproperties');
+        Route::get('/user/edit', [UserController::class, 'edit'])->name('profile.edit');
+        Route::get('/property/add', [PropertyAdvertisementController::class, 'add'])->name('property.add');
+
+        
+
+
 
 
 

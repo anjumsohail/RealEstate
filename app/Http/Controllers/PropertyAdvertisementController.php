@@ -6,6 +6,7 @@ use App\Http\Resources\PropertyAdvertisementResource;
 use App\Models\PropertyAdvertisement;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PropertyAdvertisementController extends Controller
 {
@@ -21,10 +22,23 @@ class PropertyAdvertisementController extends Controller
         return PropertyAdvertisementResource::collection($query->get());
     }
 
+    public function add()
+    {
+        return view('pages.propertyadd');
+    }
+
     public function store(StorePropertyRequest $request)
     {
+        Log::info('Storing user data', ['request' => $request->all()]);
+        //   dd($request->all());  // pauses execution and shows data
         $data = $request->validated();
         $data['user_id'] = Auth::id();
+
+        if ($request->hasFile('property_image')) {
+        $path = $request->file('property_image')->store('property_images', 'public');
+        $data['property_image'] = $path;
+    }
+
         $property = PropertyAdvertisement::create($data);
         return new PropertyAdvertisementResource($property->load('user.businessProfile'));
     }

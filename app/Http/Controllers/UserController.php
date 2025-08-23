@@ -16,11 +16,25 @@ class UserController extends Controller
      */
     public function index()
     {
-        $query = User::with(['businessProfile', 'properties']);
+        //$query = User::with(['businessProfile', 'properties']);
         if (Auth::user()->role !== 'Admin') {
             $user = User::with(['businessProfile', 'properties'])->findOrFail(Auth::id());
         }
        return view('pages.user', compact('user'));
+    }
+
+    public function UserProperties()
+    {
+             //if (Auth::user()->role !== 'Admin') {
+//            $user = User::with(['businessProfile', 'properties'])->findOrFail(Auth::id());        }
+       return view('pages.userproperties');
+    }
+
+    
+   public function edit()
+    {
+   $user = User::with(['businessProfile', 'properties'])->findOrFail(Auth::id());
+    return view('pages.profile', compact('user'));
     }
 
     public function store(StoreUserRequest $request)
@@ -31,10 +45,10 @@ class UserController extends Controller
         return new UserResource($user->load(['businessProfile', 'properties']));
     }
 
+
     public function show(User $user)
     {
-        if (Auth::user()->role !== 'Admin' && Auth::id() !== $user->id) {
-            abort(403, 'Unauthorized');
+        if (Auth::user()->role !== 'Admin' && Auth::id() !== $user->id) {abort(403, 'Unauthorized');
         }
         return new UserResource($user->load(['businessProfile', 'properties']));
     }
