@@ -37,63 +37,9 @@
             </div>
 
             <div class="row g-2">
-                <div class="col-md-10">
-
-
-                    <div class="row mb-3">
-                        <!-- City -->
-                        <div class="col-md-3 col-sm-6 mb-3">
-                            <label for="cityid" class="fw-bold">City:</label>
-                            <select wire:model.live="selectedCity" id="cityid" class="form-control">
-                                <option value="">-- Select City --</option>
-                                @foreach ($cities as $city)
-                                    <option value="{{ $city->id }}">{{ $city->name }}</option>
-                                @endforeach
-                                <!-- ... keep your other options -->
-                            </select>
-                        </div>
-
-                        <!-- Town/Area -->
-                        <div class="col-md-3 col-sm-6 mb-3">
-                            <label for="townid" class="fw-bold">Town/Area:</label>
-                            <select wire:model.live="selectedTown" id="townid" class="form-control"
-                                data-fv-notempty="true" data-fv-notempty-message="Please select area.">
-                                <option value="">-- Select Area --</option>
-                                @foreach ($towns as $town)
-                                    <option value="{{ $town->id }}">{{ $town->name }}</option>
-                                @endforeach
-                                <!-- ... keep your other options -->
-                            </select>
-                        </div>
-
-                        <!-- Project -->
-                        <div class="col-md-3 col-sm-6 mb-3">
-                            <label for="sectorid" class="fw-bold">Project/Society/Sectors:</label>
-                            <select wire:model.live="selectedSector" id="sectorid" class="form-control"
-                                data-fv-notempty="true" data-fv-notempty-message="Select Project...">
-                                <option value="">-- Select Project --</option>
-                                @foreach ($sectors as $sector)
-                                    <option value="{{ $sector->id }}">{{ $sector->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <!-- Phase/Block -->
-                        <div class="col-md-3 col-sm-6 mb-3">
-                            <label for="blockid" class="fw-bold">Phase/Block:</label>
-                            <select wire:model="selectedBlock" class="form-control" data-fv-notempty="true"
-                                data-fv-notempty-message="Select Block.">
-                                <option value="">-- Select Block --</option>
-                                @foreach ($blocks as $block)
-                                    <option value="{{ $block->id }}">{{ $block->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-
-
-
-                </div>
+                <!-- Selection Start -->
+                @livewire('selection-component', ['columnClass' => 'col-md-10'])
+                <!-- Selection End -->
                 <div class="col-md-2">
                     <button class="btn btn-dark border-0 w-100 py-3">Search</button>
                 </div>

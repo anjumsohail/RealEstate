@@ -27,7 +27,7 @@ protected function prepareForValidation()
      */
     public function rules(): array
     {
-       //dd(request()->all()); // or Log::info(request()->all());
+      // dd(request()->all()); // or Log::info(request()->all());
         return [
             'purpose' => 'required|in:Sale,Rent',
             'category' => 'required|in:Residential,Commercial',
@@ -36,6 +36,9 @@ protected function prepareForValidation()
             'description' => 'nullable|string',
             'address' => 'nullable|string|max:255',
             'city_id' => 'required|string|max:100',
+            'town_id' => 'string|max:100',
+            'sector_id' => 'string|max:100',
+            'block_id' => 'string|max:100',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
             'area_size' => 'required|string|min:0',
@@ -44,7 +47,21 @@ protected function prepareForValidation()
             'front_face' => 'nullable|string|max:255',
             'back_site' => 'nullable|string|max:255',
             'demand_price' => 'required|numeric|min:0',
-            'property_image' => 'nullable|image|mimes:jpg,png,jpeg|max:4096',
+
+            // ✅ pictures are optional now
+            'pictures'    => 'nullable',
+            'pictures.*'  => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
+            // ✅ picture titles (optional, must be same count as pictures if provided)
+            'picture_titles'   => 'nullable|array',
+            'picture_titles.*' => 'nullable|string|max:255',
+
+            'floor'=> 'nullable|string|max:255',
+            'positioning'=> 'nullable|string|max:255',
+            'front_face'=> 'nullable|string|max:255',
+            'back_site' => 'nullable|string|max:255',
+            'postas' => 'nullable|string|max:255',
+            'social'=> 'nullable|string|max:255',
             'user_id' => 'required|exists:users,id'
         ];
     }

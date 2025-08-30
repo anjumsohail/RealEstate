@@ -436,6 +436,12 @@
     border-color: rgba(255, 255, 255, 0.5);
 }
 
+.form-group {
+    margin-bottom: 15px;
+}
+.has-feedback {
+    position: relative;
+}
 .footer .copyright {
     padding: 25px 0;
     font-size: 15px;
@@ -673,4 +679,23 @@ body {
 .hr4 {
     height: 0;
     border-bottom: 1px dashed #eee;
+}
+
+.thumb-box {
+    width: auto;
+    height: 120px; /* fixed height for thumbnails */
+    overflow: hidden; /* hide anything outside the box */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f8f9fa; /* light background */
+}
+
+.thumb-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* ensures fill while cropping */
+    border-radius: 8px;
 }

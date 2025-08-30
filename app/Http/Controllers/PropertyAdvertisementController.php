@@ -6,7 +6,8 @@ use App\Http\Resources\PropertyAdvertisementResource;
 use App\Models\PropertyAdvertisement;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+
+
 
 class PropertyAdvertisementController extends Controller
 {
@@ -27,19 +28,29 @@ class PropertyAdvertisementController extends Controller
         return view('pages.propertyadd');
     }
 
-    public function store(StorePropertyRequest $request)
+    public function store(Request $request)
     {
-        Log::info('Storing user data', ['request' => $request->all()]);
-        //   dd($request->all());  // pauses execution and shows data
-        $data = $request->validated();
+        
+        //dd($request->all());  // pauses execution and shows data
+        //$data = $request->validated();
+        $data = $request->all();
         $data['user_id'] = Auth::id();
+        dd($data);  // pauses execution and shows data
+        $property = PropertyAdvertisement::create($data);
 
-        if ($request->hasFile('property_image')) {
-        $path = $request->file('property_image')->store('property_images', 'public');
-        $data['property_image'] = $path;
+// Save pictures if uploaded
+    if ($request->hasFile('pictures')) {
+        foreach ($request->file('pictures') as $index => $file) {
+            $path = $file->store('property_images', 'public');
+
+            $property->pictures()->create([
+                'title'      => $request->picture_titles[$index] ?? null,
+                'image_path' => $path,
+            ]);
+        }
     }
 
-        $property = PropertyAdvertisement::create($data);
+        
         return new PropertyAdvertisementResource($property->load('user.businessProfile'));
     }
 
@@ -84,8 +95,8 @@ class PropertyAdvertisementController extends Controller
         }
 
         // Filter by type (Plot/Home/Apartment/Portion/Cottage)
-        if ($request->filled('type')) {
-            $query->where('type', $request->type);
+        if ($request->filled('proptype')) {
+            $query->where('proptype', $request->proptype);
         }
 
         // Filter by city
