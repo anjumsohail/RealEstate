@@ -1,4 +1,4 @@
-# Pins.pk - Pakistan Real Estate Portal
+# Makaan Pk - Pakistan Real Estate Portal
 
 ![Pins.pk Screenshot] <!-- Add actual screenshot later -->
 
@@ -56,7 +56,7 @@ A comprehensive Laravel-based real estate platform connecting buyers, sellers, a
 
 1. Clone repository:
    bash
-   git clone https://github.com/yourrepo/pins-pk.git
+   git clone https://github.com/anjumsohail/RealEstate.git
    composer install
    npm install
    cp .env.example .env
