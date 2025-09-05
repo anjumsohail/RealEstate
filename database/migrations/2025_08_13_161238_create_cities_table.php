@@ -15,6 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('name')->unique();
             $table->timestamps();
+        // OSM relation id (nullable, not necessarily unique — a city may share a relation sometimes)
+        $table->bigInteger('osm_relation_id')->nullable();
+        // Geometry column with SRID 4326
+        $table->geometry('boundary', 4326);
+        // Spatial index for efficient geo queries
+        $table->spatialIndex('boundary', 'cities_geometry_spatial_index');
+
         });
     }
 

@@ -14,6 +14,12 @@ return new class extends Migration
         Schema::create('sectors', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+                    // OSM relation id (nullable, not necessarily unique — a city may share a relation sometimes)
+        $table->bigInteger('osm_relation_id')->nullable();
+        // Geometry column with SRID 4326
+        $table->geometry('boundary', 4326);
+        // Spatial index for efficient geo queries
+        $table->spatialIndex('boundary', 'sectors_geometry_spatial_index');
             $table->foreignId('town_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
