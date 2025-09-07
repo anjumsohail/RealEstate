@@ -9,48 +9,49 @@ WHERE id = 1;
 Query 1: Find cities that CONTAIN the point using MBR
 sql
 SELECT 
-    city_id,
-    city_name,
-    ST_AsText(boundary) as boundary_wkt
+    id,
+    name,
+    ST_AsText(geometry) as boundary_wkt
 FROM cities 
 WHERE MBRContains(
-    boundary, 
+    geometry, 
     ST_GeomFromText('POINT(longitude latitude)', 4326)
 );
 Query 2: Radius search using MBRContains with buffer
 sql
 SELECT 
-    city_id,
-    city_name,
-    ST_AsText(boundary) as boundary_wkt,
+    id,
+    name,
+    ST_AsText(geometry) as boundary_wkt,
     ST_Distance(
-        ST_Centroid(boundary),
+        ST_Centroid(geometry),
         ST_GeomFromText('POINT(longitude latitude)', 4326)
     ) * 111.325 as distance_km
 FROM cities 
 WHERE MBRContains(
     ST_Buffer(
         ST_GeomFromText('POINT(longitude latitude)', 4326),
-        radius_km / 111.325
+        5 / 111.325
     ),
-    boundary
+    geometry
 );
 Query 3: Alternative using MBRIntersects for radius search
 sql
+
 SELECT 
-    city_id,
-    city_name,
-    ST_AsText(boundary) as boundary_wkt,
+    id,
+    name,
+    ST_AsText(geometry) as boundary_wkt,
     ST_Distance(
-        ST_Centroid(boundary),
+        ST_Centroid(geometry),
         ST_GeomFromText('POINT(longitude latitude)', 4326)
     ) * 111.325 as distance_km
 FROM cities 
 WHERE MBRIntersects(
-    boundary,
+    geometry,
     ST_Buffer(
         ST_GeomFromText('POINT(longitude latitude)', 4326),
-        radius_km / 111.325
+        5 / 111.325
     )
 );
 Query 4: Parameterized version with exact distance calculation
@@ -61,11 +62,11 @@ SET @radius_km = 10;
 SET @radius_degrees = @radius_km / 111.325;
 
 SELECT 
-    city_id,
-    city_name,
-    ST_AsText(boundary) as boundary_wkt,
+    id,
+    name,
+    ST_AsText(geometry) as boundary_wkt,
     (ST_Distance(
-        ST_Centroid(boundary),
+        ST_Centroid(geometry),
         ST_GeomFromText(CONCAT('POINT(', @longitude, ' ', @latitude, ')'), 4326)
     ) * 111.325) as distance_km
 FROM cities 
@@ -74,10 +75,11 @@ WHERE MBRContains(
         ST_GeomFromText(CONCAT('POINT(', @longitude, ' ', @latitude, ')'), 4326),
         @radius_degrees
     ),
-    boundary
+    geometry
 )
 HAVING distance_km <= @radius_km
 ORDER BY distance_km;
+
 Query 5: More efficient two-step approach (MBR filter + precise check)
 sql
 SET @point = ST_GeomFromText('POINT(longitude latitude)', 4326);
@@ -85,33 +87,35 @@ SET @buffer = ST_Buffer(@point, radius_km / 111.325);
 
 -- First filter by MBR (uses spatial index)
 SELECT 
-    city_id,
-    city_name,
-    ST_AsText(boundary) as boundary_wkt,
-    ST_Distance(ST_Centroid(boundary), @point) * 111.325 as distance_km
+    id,
+    name,
+    ST_AsText(geometry) as boundary_wkt,
+    ST_Distance(ST_Centroid(geometry), @point) * 111.325 as distance_km
 FROM cities 
-WHERE MBRIntersects(boundary, @buffer)
+WHERE MBRIntersects(geometry, @buffer)
 -- Then precise distance check
-HAVING distance_km <= radius_km
+HAVING distance_km <= 10
 ORDER BY distance_km;
 Query 6: Simple point-in-polygon check with MBRWithin
 sql
 SELECT 
-    city_id,
-    city_name
+    id,
+    name
 FROM cities 
 WHERE MBRWithin(
     ST_GeomFromText('POINT(longitude latitude)', 4326),
-    boundary
+    geometry
 )
-AND ST_Contains(boundary, ST_GeomFromText('POINT(longitude latitude)', 4326));
-
+AND ST_Contains(geometry, ST_GeomFromText('POINT(longitude latitude)', 4326));
 
 
 SELECT to_GeoJSON(ST_AsText(geometry)) as geojson
 FROM cities 
 WHERE id = 1;
 
+SELECT ST_AsGeoJSON(geometry) 
+FROM cities 
+WHERE id = 1
 
 DELIMITER //
 
@@ -163,5 +167,4 @@ DELIMITER ;
 
 SELECT to_GeoJSON(ST_AsText(geometry)) as geojson
 FROM cities 
-
 WHERE id = 1;
