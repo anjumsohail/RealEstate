@@ -1,3 +1,7 @@
+SET @latitude  = 24.8607;   -- input latitude
+SET @longitude  = 67.0011;   -- input longitude
+SET @radius_km = 5000;      -- radius in meters (e.g. 5000m = 5km)
+
 SELECT ST_AsGeoJSON(geometry) AS geojson
 FROM cities
 WHERE id = 1;
@@ -159,4 +163,5 @@ DELIMITER ;
 
 SELECT to_GeoJSON(ST_AsText(geometry)) as geojson
 FROM cities 
+
 WHERE id = 1;
