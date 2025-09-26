@@ -1,0 +1,224 @@
+SELECT ST_AsGeoJSON(geometry) AS geojson
+FROM cities
+WHERE id = 1;
+
+Correct Point-in-Polygon Query
+SET @latitude  = 24.8607;   -- input latitude
+SET @longitude = 67.0011;   -- input longitude
+
+SELECT 
+    id,
+    name
+FROM cities
+WHERE ST_Contains(
+    geometry,
+    ST_GeomFromText(CONCAT('POINT(', @longitude, ' ', @latitude, ')'), 4326)
+);
+
+
+This should return Karachi if your geometry is valid and the point lies inside.
+
+✅ Radius Search (Accurate)
+SET @latitude  = 24.8607;
+SET @longitude = 67.0011;
+SET @radius_km = 10;  -- radius in kilometers
+SET @radius_deg = @radius_km / 111.325;  -- convert km to approx degrees
+
+SET @point = ST_GeomFromText(CONCAT('POINT(', @longitude, ' ', @latitude, ')'), 4326);
+
+SELECT 
+    id,
+    name,
+    ST_Distance_Sphere(ST_Centroid(geometry), @point) / 1000 AS distance_km
+FROM cities
+WHERE ST_Intersects(
+    geometry,
+    ST_Buffer(@point, @radius_deg)
+)
+HAVING distance_km <= @radius_km
+ORDER BY distance_km;
+
+
+Notes:
+
+ST_Distance_Sphere() (MySQL 8.0+) gives true geodesic distance in meters instead of a rough degrees-to-km conversion.
+
+ST_Buffer(..., @radius_deg) still uses planar geometry but is okay for pre-filtering.
+
+Always use ST_Contains or ST_Intersects instead of MBRContains unless you only care about bounding boxes.
+
+===========================================================
+Query 1: Fixed Point-in-Polygon Check
+sql
+SELECT 
+    id,
+    name,
+    ST_AsText(geometry) as boundary_wkt
+FROM cities 
+WHERE MBRContains(
+    geometry, 
+    ST_GeomFromText(CONCAT('POINT(', 67.0011, ' ', 24.8607, ')'), 4326)
+)
+AND ST_Contains(geometry, ST_GeomFromText(CONCAT('POINT(', 67.0011, ' ', 24.8607, ')'), 4326));
+Query 4: Parameterized with Correct Syntax
+sql
+SET @latitude = 24.8607;
+SET @longitude = 67.0011;
+SET @radius_km = 10;
+SET @radius_degrees = @radius_km / 111.325;
+
+SELECT 
+    id,
+    name,
+    ST_AsText(geometry) as boundary_wkt,
+    (ST_Distance(
+        ST_Centroid(geometry),
+        ST_GeomFromText(CONCAT('POINT(', @longitude, ' ', @latitude, ')'), 4326)
+    ) * 111.325) as distance_km
+FROM cities 
+WHERE MBRIntersects(
+    geometry,
+    ST_Buffer(
+        ST_GeomFromText(CONCAT('POINT(', @longitude, ' ', @latitude, ')'), 4326),
+        @radius_degrees
+    )
+)
+HAVING distance_km <= @radius_km
+ORDER BY distance_km;
+Most Recommended Query (Efficient and Accurate):
+
+SET @latitude = 24.8607;
+SET @longitude = 67.0011;
+SET @point = ST_GeomFromText(CONCAT('POINT(', @longitude, ' ', @latitude, ')'), 4326);
+SET @radius_km = 10;
+SET @buffer_radius = @radius_km / 111.325;
+
+SELECT 
+    id,
+    name,
+    ST_AsText(geometry) as boundary_wkt,
+    ST_Distance(ST_Centroid(geometry), @point) * 111.325 as distance_km
+FROM cities 
+WHERE MBRIntersects(geometry, ST_Buffer(@point, @buffer_radius))
+AND ST_Contains(geometry, @point)
+ORDER BY distance_km;
+
+
+For Radius Search (find cities within X km of point):
+sql
+SET @latitude = 24.803370;
+SET @longitude = 67.446755;
+SET @point = ST_GeomFromText(CONCAT('POINT(', @longitude, ' ', @latitude, ')'), 4326);
+SET @radius_km = 100;
+SET @buffer_radius = @radius_km / 111.325;
+
+SELECT 
+    id,
+    name,
+    ST_AsText(geometry) as boundary_wkt,
+    ST_Distance(ST_Centroid(geometry), @point) * 111.325 as distance_km
+FROM cities 
+WHERE MBRIntersects(geometry, ST_Buffer(@point, @buffer_radius))
+ORDER BY distance_km;
+For Point-in-Polygon Check (find cities that contain the point):
+sql
+SET @latitude = 24.803370;
+SET @longitude = 67.446755;
+SET @point = ST_GeomFromText(CONCAT('POINT(', @longitude, ' ', @latitude, ')'), 4326);
+
+SELECT 
+    id,
+    name,
+    ST_AsText(geometry) as boundary_wkt
+FROM cities 
+WHERE ST_Contains(geometry, @point);
+More Accurate Radius Search:
+The buffer approach is approximate. For better accuracy, use:
+
+sql
+SET @latitude = 24.803370;
+SET @longitude = 67.446755;
+SET @point = ST_GeomFromText(CONCAT('POINT(', @longitude, ' ', @latitude, ')'), 4326);
+SET @radius_km = 100;
+
+SELECT 
+    id,
+    name,
+    ST_AsText(geometry) as boundary_wkt,
+    (ST_Distance(geometry, @point) * 111.325) as distance_km
+FROM cities 
+WHERE ST_Distance(geometry, @point) * 111.325 <= @radius_km
+ORDER BY distance_km;
+Combined Approach (radius search + optional containment):
+If you want to find cities either containing the point OR within radius:
+
+sql
+SET @latitude = 24.803370;
+SET @longitude = 67.446755;
+SET @point = ST_GeomFromText(CONCAT('POINT(', @longitude, ' ', @latitude, ')'), 4326);
+SET @radius_km = 100;
+SET @buffer_radius = @radius_km / 111.325;
+
+SELECT 
+    id,
+    name,
+    ST_AsText(geometry) as boundary_wkt,
+    ST_Distance(ST_Centroid(geometry), @point) * 111.325 as distance_km,
+    CASE WHEN ST_Contains(geometry, @point) THEN 1 ELSE 0 END as contains_point
+FROM cities 
+WHERE MBRIntersects(geometry, ST_Buffer(@point, @buffer_radius))
+   OR ST_Contains(geometry, @point)
+ORDER BY contains_point DESC, distance_km;
+
+
+DELIMITER //
+
+CREATE FUNCTION to_GeoJSON(wkt_geometry TEXT) RETURNS TEXT
+DETERMINISTIC
+READS SQL DATA
+BEGIN
+    DECLARE geojson TEXT;
+    DECLARE clean_coords TEXT;
+    DECLARE formatted TEXT DEFAULT '';
+    DECLARE pos INT;
+    DECLARE pair TEXT;
+    
+    -- Extract coordinates from WKT
+    SET clean_coords = REPLACE(REPLACE(wkt_geometry, 'POLYGON((', ''), '))', '');
+    
+    -- Process each coordinate pair
+    WHILE LENGTH(clean_coords) > 0 DO
+        SET pos = LOCATE(',', clean_coords);
+        IF pos = 0 THEN
+            SET pair = clean_coords;
+            SET clean_coords = '';
+        ELSE
+            SET pair = SUBSTRING(clean_coords, 1, pos - 1);
+            SET clean_coords = SUBSTRING(clean_coords, pos + 1);
+        END IF;
+        
+        -- Format the coordinate pair
+        IF LENGTH(formatted) > 0 THEN
+            SET formatted = CONCAT(formatted, ',');
+        END IF;
+        
+        SET formatted = CONCAT(formatted, '[', REPLACE(TRIM(pair), ' ', ','), ']');
+    END WHILE;
+    
+    -- Build the complete GeoJSON
+    SET geojson = CONCAT(
+        '{"type":"Feature","geometry":',
+        '{"type":"Polygon","coordinates":[',
+        '[', formatted, ']',
+        ']},"properties":{}',
+        '}'
+    );
+    
+    RETURN geojson;
+END //
+
+DELIMITER ;
+
+SELECT to_GeoJSON(ST_AsText(geometry)) as geojson
+FROM cities 
+WHERE id = 1;

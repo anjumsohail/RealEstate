@@ -27,9 +27,30 @@
     <!-- Search Start -->
     @livewire('property-search')
     <!-- Search End -->
-
-
-    <!-- Category Start -->
+   <!-- About Start -->
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6 wow fadeIn" data-wow-delay="0.1s">
+                    <div class="about-img position-relative overflow-hidden p-5 pe-0">
+                        <img class="img-fluid w-100" src="img/MapSearch.gif">
+                    </div>
+                </div>
+                <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
+                    <h1 class="mb-4">Seamlessly Search with Our Map Search Feature</h1>
+                    <p class="mb-4">Our map search tool empowers you to browse listings based on their physical location.</p>
+                    <p><i class="fa fa-check text-primary me-3"></i>Zoom in to a specific street</p>
+                    <p><i class="fa fa-check text-primary me-3"></i>draw a custom polygon around your desired neighborhood</p>
+                    <p><i class="fa fa-check text-primary me-3"></i>filter by a specific radius</p>
+                    <p><i class="fa fa-check text-primary me-3"></i>Each property is marked with a clear pin</p>
+                    <p><i class="fa fa-check text-primary me-3"></i>Listing provide link to the full listing details, photos, and price</p>                    
+                    <a class="btn btn-primary py-3 px-5 mt-3" href="{{ route('property.MapSearch') }}">Map Search</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- About End -->
+        <!-- Category Start -->
     <div class="container-xxl py-5">
         <div class="container">
             <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 600px;">
@@ -130,30 +151,6 @@
         </div>
     </div>
     <!-- Category End -->
-
-
-    <!-- About Start -->
-    <div class="container-xxl py-5">
-        <div class="container">
-            <div class="row g-5 align-items-center">
-                <div class="col-lg-6 wow fadeIn" data-wow-delay="0.1s">
-                    <div class="about-img position-relative overflow-hidden p-5 pe-0">
-                        <img class="img-fluid w-100" src="img/about.jpg">
-                    </div>
-                </div>
-                <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
-                    <h1 class="mb-4">#1 Place To Find The Perfect Property</h1>
-                    <p class="mb-4">Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit. Aliqu diam amet diam et
-                        eos. Clita erat ipsum et lorem et sit, sed stet lorem sit clita duo justo magna dolore erat amet</p>
-                    <p><i class="fa fa-check text-primary me-3"></i>Tempor erat elitr rebum at clita</p>
-                    <p><i class="fa fa-check text-primary me-3"></i>Aliqu diam amet diam et eos</p>
-                    <p><i class="fa fa-check text-primary me-3"></i>Clita duo justo magna dolore erat amet</p>
-                    <a class="btn btn-primary py-3 px-5 mt-3" href="">Read More</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- About End -->
 
 
     <!-- Property List Start -->

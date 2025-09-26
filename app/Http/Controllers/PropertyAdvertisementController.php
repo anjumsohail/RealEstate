@@ -28,6 +28,11 @@ class PropertyAdvertisementController extends Controller
         return view('pages.propertyadd');
     }
 
+    public function MapSearch()
+    {
+        return view('pages.MapSearch');
+    }
+
     public function store(Request $request)
     {
         

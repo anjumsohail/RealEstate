@@ -49,11 +49,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/user/properties', [UserController::class, 'UserProperties'])->name('property.myproperties');
         Route::get('/user/edit', [UserController::class, 'edit'])->name('profile.edit');
         Route::get('/property/add', [PropertyAdvertisementController::class, 'add'])->name('property.add');
-
-        
-
-
-
+        Route::get('/property/MapSearch', [PropertyAdvertisementController::class, 'MapSearch'])->name('property.MapSearch');
 
 
 });

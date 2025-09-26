@@ -9,151 +9,209 @@ use Illuminate\Support\Facades\Storage;
 
 class UpdateGeometry extends Command
 {
-    protected $signature = 'geometry:update {--table=} {--id=}';
-    protected $description = 'Fetch OSM relation or way polygon and update geometry column for cities, towns, sectors, or blocks';
+    protected $signature = 'geometry:update {--table=} {--id=} {--geojson}';
+    protected $description = 'Fetch OSM geometry and update database geometry column (supports cities, towns, sectors, blocks)';
 
     public function handle()
     {
         $table = $this->option('table');
         $id    = $this->option('id');
+        $saveGeoJson = $this->option('geojson');
 
         if (!$table || !in_array($table, ['cities', 'towns', 'sectors', 'blocks'])) {
             $this->error("Please provide --table=cities|towns|sectors|blocks");
             return;
         }
 
-        $this->info("=== Processing table: {$table}" . ($id ? " (id={$id})" : " (all)") . " ===");
+        $this->info("=== Processing table: {$table}" . ($id ? " id={$id}" : " (all)") . " ===");
 
         $query = DB::table($table)
+            ->select('id', 'osm_relation_id')
             ->when($id, fn($q) => $q->where('id', $id))
-            ->whereNotNull('osm_relation_id') // or osm_way_id if you store it
-            ->where('osm_relation_id', '>', 0)   // skip invalid ids
+            ->whereNotNull('osm_relation_id')
+            ->where('osm_relation_id', '>', 0)
             ->get();
 
         foreach ($query as $row) {
-            $osmId = $row->osm_relation_id; // or osm_way_id if you have that separately
-            $type  = $this->detectOSMType($osmId); // returns 'relation' or 'way'
+            try {
+                $osmId = $row->osm_relation_id;
 
-            if (!$type) {
-                $this->warn("⚠️ Cannot detect OSM type for {$table} id={$row->id} (OSM={$osmId})");
-                continue;
+                // Detect type (relation or way)
+                $type = $this->detectOSMType($osmId);
+                if (!$type) {
+                    $this->warn("⚠️ Could not detect OSM type for {$table} id={$row->id}");
+                    continue;
+                }
+
+                $this->info("=== Processing {$table} id={$row->id}, OSM {$type}={$osmId} ===");
+
+                // Fetch raw Overpass JSON
+                $jsonData = $this->fetchOverpass($osmId, $type);
+                if (!$jsonData) {
+                    $this->error("❌ Failed fetching OSM {$type}={$osmId}");
+                    continue;
+                }
+
+                // Save raw JSON for debug
+                $dir = "osm_raw/{$table}";
+                Storage::makeDirectory($dir);
+                Storage::put("{$dir}/{$row->id}.json", json_encode($jsonData, JSON_PRETTY_PRINT));
+
+                // Convert to GeoJSON using osmtogeojson
+                $geojson = $this->convertToGeoJSON($jsonData);
+                if (!$geojson) {
+                    $this->error("❌ osmtogeojson conversion failed for {$table} id={$row->id}");
+                    continue;
+                }
+
+                if ($saveGeoJson) {
+                    $geoDir = "geojson/{$table}";
+                    Storage::makeDirectory($geoDir);
+                    Storage::put("{$geoDir}/{$row->id}.geojson", $geojson);
+                    $this->info("📂 GeoJSON saved for {$table} id={$row->id}");
+                }
+
+                // Convert GeoJSON → WKT
+                $wkt = $this->geojsonToWKT($geojson);
+                if (!$wkt) {
+                    $this->warn("⚠️ Could not generate WKT for {$table} id={$row->id}");
+                    continue;
+                }
+
+                // Update DB
+                DB::statement("UPDATE {$table} SET geometry = ST_GeomFromText(?, 4326) WHERE id = ?", [$wkt, $row->id]);
+                $this->info("✅ Geometry updated for {$table} id={$row->id}");
+
+            } catch (\Throwable $e) {
+                $this->error("💥 Exception at {$table} id={$row->id}: " . $e->getMessage());
             }
-
-            $this->info("📡 Fetching OSM {$type} {$osmId} for {$table} id={$row->id}");
-
-            $data = $this->fetchGeometryFromOSM($osmId, $type);
-
-            if (!$data || empty($data['elements'])) {
-                $this->info("Data fetch{$data}");
-                $this->error("❌ Overpass request failed for {$table} id={$row->id} (OSM={$osmId})");
-                continue;
-            }
-
-            // Save raw GeoJSON
-            $dir = "{$table}";
-            Storage::makeDirectory($dir);
-            Storage::put("{$dir}/{$row->id}.json", json_encode($data, JSON_PRETTY_PRINT));
-
-            // Convert to WKT
-            $wkt = $this->convertToWKT($data);
-
-            if (!$wkt) {
-                $this->warn("⚠️ No polygon/multipolygon geometry found for {$table} id={$row->id}");
-                continue;
-            }
-
-            // Update DB
-            DB::statement("
-                UPDATE {$table}
-                SET geometry = ST_GeomFromText(?, 4326)
-                WHERE id = ?
-            ", [$wkt, $row->id]);
-
-            $this->info("✅ Updated {$table} id={$row->id} with geometry");
         }
 
-        $this->info("Done.");
+        $this->info("=== Done. ===");
     }
 
     protected function detectOSMType($osmId)
-{
-    // Try relation first
-    $types = ['R', 'W']; // R=relation, W=way
-    foreach ($types as $type) {
-        $url = "https://nominatim.openstreetmap.org/lookup?format=json&osm_ids={$type}{$osmId}";
-        $response = Http::withHeaders([
-            'User-Agent' => 'MyLaravelApp/1.0'
-        ])->timeout(30)->get($url);
-
-        if (!$response->ok()) {
-            continue;
-        }
-
-        $json = $response->json();
-        if (!empty($json) && isset($json[0]['osm_type'])) {
-            return $json[0]['osm_type'] === 'way' ? 'way' : ($json[0]['osm_type'] === 'relation' ? 'relation' : null);
-        }
-    }
-
-    return null; // Could not detect
-}
-
-    protected function fetchGeometryFromOSM($osmId, $type)
     {
-        $url   = "https://overpass-api.de/api/interpreter";
-        $query = "[out:json];{$type}({$osmId});out geom;";
+        $url = "https://nominatim.openstreetmap.org/lookup?format=json&osm_ids=R{$osmId},W{$osmId}";
+        $resp = Http::withHeaders(['User-Agent' => 'MyLaravelApp/1.0'])->get($url);
+        if (!$resp->ok()) return null;
 
-        $response = Http::timeout(60)->get($url, ['data' => $query]);
+        $data = $resp->json();
+        if (empty($data)) return null;
 
-        if (!$response->ok()) return null;
-
-        return $response->json();
+        return $data[0]['osm_type'] ?? null; // "relation" or "way"
     }
 
-    protected function convertToWKT($data)
+        protected function fetchOverpass($osmId, $type)
+            {
+                // Use body geom to avoid 400 errors
+                $query = "[out:json][timeout:60];{$type}({$osmId});(._;>;);out body geom;";
+                $url   = "https://overpass-api.de/api/interpreter";
+
+                $this->info("🔎 Overpass Debug:");
+                $this->line("   Query: " . $query);
+
+                $resp = Http::timeout(60)->asForm()->post($url, ['data' => $query]);
+
+                if (!$resp->ok()) {
+                    $this->error("   ❌ Overpass HTTP Status: {$resp->status()}");
+                    $this->line("   Raw Body (first 300 chars): " . substr($resp->body(), 0, 300));
+                    return null;
+                }
+
+                $json = json_decode($resp->body(), true);
+
+                if (!$json || !isset($json['elements'])) {
+                    $this->error("   ❌ Invalid Overpass JSON response");
+                    return null;
+                }
+
+                return $json;
+            }
+
+
+    protected function convertToGeoJSON($jsonData)
+    {
+        $inputFile = storage_path('app/osm_input.json');
+        $outputFile = storage_path('app/osm_output.geojson');
+
+        file_put_contents($inputFile, json_encode($jsonData));
+
+        $cmd = "osmtogeojson " . escapeshellarg($inputFile) . " > " . escapeshellarg($outputFile) . " 2>&1";
+        exec($cmd, $output, $returnCode);
+
+        if ($returnCode !== 0) {
+            $this->error("   ❌ osmtogeojson failed: " . implode("\n", $output));
+            return null;
+        }
+
+        return file_get_contents($outputFile);
+    }
+
+    protected function geojsonToWKT($geojson)
+    {
+        $data = json_decode($geojson, true);
+        if (!$data || !isset($data['features'])) return null;
+
+        $wkts = [];
+
+        foreach ($data['features'] as $feature) {
+            $geom = $feature['geometry'] ?? null;
+            if (!$geom) continue;
+
+            $type = strtoupper($geom['type']);
+            $coords = $geom['coordinates'];
+
+            switch ($type) {
+                case 'POLYGON':
+                    $wkts[] = $this->polygonToWKT($coords);
+                    break;
+                case 'MULTIPOLYGON':
+                    $wkts[] = $this->multiPolygonToWKT($coords);
+                    break;
+            }
+        }
+
+        if (empty($wkts)) return null;
+        return count($wkts) === 1 ? $wkts[0] : "MULTIPOLYGON(" . implode(",", array_map(fn($w) => trim(str_replace("POLYGON", "", $w)), $wkts)) . ")";
+    }
+
+    private function polygonToWKT($coords)
+    {
+        $rings = [];
+        foreach ($coords as $ring) {
+            $points = array_map(fn($p) => $p[0] . " " . $p[1], $ring);
+            if ($points[0] !== end($points)) $points[] = $points[0];
+            $rings[] = "(" . implode(",", $points) . ")";
+        }
+        return "POLYGON(" . implode(",", $rings) . ")";
+    }
+
+    private function multiPolygonToWKT($coords)
     {
         $polygons = [];
-
-        foreach ($data['elements'] as $element) {
-            if (!isset($element['members'])) {
-                // For way, geometry is directly in element['geometry']
-                if (isset($element['geometry'])) {
-                    $coords = [];
-                    foreach ($element['geometry'] as $point) {
-                        $coords[] = "{$point['lon']} {$point['lat']}";
-                    }
-                    if ($coords[0] !== end($coords)) $coords[] = $coords[0];
-                    $polygons[] = "((" . implode(", ", $coords) . "))";
-                }
-                continue;
+        foreach ($coords as $poly) {
+            $rings = [];
+            foreach ($poly as $ring) {
+                $points = array_map(fn($p) => $p[0] . " " . $p[1], $ring);
+                if ($points[0] !== end($points)) $points[] = $points[0];
+                $rings[] = "(" . implode(",", $points) . ")";
             }
-
-            foreach ($element['members'] as $member) {
-                if (!isset($member['geometry'])) continue;
-
-                $coords = [];
-                foreach ($member['geometry'] as $point) {
-                    $coords[] = "{$point['lon']} {$point['lat']}";
-                }
-                if ($coords[0] !== end($coords)) $coords[] = $coords[0];
-                $polygons[] = "((" . implode(", ", $coords) . "))";
-            }
+            $polygons[] = "(" . implode(",", $rings) . ")";
         }
-
-        if (count($polygons) === 0) return null;
-        if (count($polygons) === 1) return "POLYGON{$polygons[0]}";
-
-        return "MULTIPOLYGON(" . implode(", ", $polygons) . ")";
+        return "MULTIPOLYGON(" . implode(",", $polygons) . ")";
     }
 }
-
 
 /*
 https://nominatim.openstreetmap.org/ui/search.html
+https://overpass-api.de/api/interpreter?data=[out:json];relation(6080948);out%20geom;
+https://overpass-turbo.eu/#
+
 osm_relation_id	bigint(20)	
 update cities set osm_relation_id=6080948 where id=1;
 
-Update a specific city: 		php artisan geometry:update --table=cities --id=1
+Update a specific city: 		php artisan geometry:update --table=cities --id=1 --geojson
 Update all towns: 				php artisan geometry:update --table=towns
 Update a specific block: 		php artisan geometry:update --table=blocks --id=12
 Update all sectors: 			php artisan geometry:update --table=sectors
