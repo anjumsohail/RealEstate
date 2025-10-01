@@ -15,7 +15,10 @@ class MapSearch extends Component
     public $longitude = 67.1541;
     public $radius = 10;
     public $results = [];
+    public $properties = [];
     public $searched = false;
+    public $propertyCount = 1 ;
+
 
     public function setCoordinates($latitude, $longitude)
     {
@@ -39,6 +42,7 @@ class MapSearch extends Component
         $this->longitude = 67.1541;
         $this->radius = 10;
         $this->results = [];
+        $this->properties = [];
         $this->searched = false;
         $this->resetPage(); // reset to page 1
     }
@@ -50,6 +54,13 @@ class MapSearch extends Component
             $this->longitude,
             $this->radius,
         ]);
+
+        $this->properties = DB::select(
+            "CALL GetPropertiesInArea(?, ?, ?)", 
+            [$this->latitude, $this->longitude, $this->radius]
+        );
+
+        $this->propertyCount = count($this->properties);
 
         // convert to array for Livewire-friendly serialization
         $this->results = collect($rows)->map(function ($row) {
@@ -101,6 +112,8 @@ class MapSearch extends Component
 
         return view('livewire.map-search', [
             'geoData' => $this->searched ? $this->paginatedResults : $emptyPaginator,
+            'properties'=>$this->properties,
+            'propertyCount' => $this->propertyCount,
         ]);
     
     }

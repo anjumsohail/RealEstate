@@ -21,34 +21,13 @@
     
      {{-- Results --}}
     @if($searched && $geoData->count())
-        <table class="table-auto border-collapse border border-gray-400 w-full text-sm">
-            <thead>
-                <tr>
-                    <th class="border px-2 py-1">Level</th>
-                    <th class="border px-2 py-1">Name</th>
-                    <th class="border px-2 py-1">Level</th>
-                    <th class="border px-2 py-1">Name</th>
-                    <th class="border px-2 py-1">Level</th>
-                    <th class="border px-2 py-1">Name</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($geoData->chunk(3) as $row)
-                    <tr>
-                        @foreach($row as $item)
-                            <td class="border px-2 py-1">{{ $item['level'] }}</td>
-                            <td class="border px-2 py-1">{{ $item['name'] }}</td>
-                        @endforeach
-
-                        {{-- Fill empty cells if less than 3 pairs --}}
-                        @for($i = $row->count(); $i < 3; $i++)
-                            <td class="border px-2 py-1">&nbsp;</td>
-                            <td class="border px-2 py-1">&nbsp;</td>
-                        @endfor
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+               <div class="boxes" style="display: flex; flex-wrap: wrap; gap: 10px;">
+             @foreach($geoData as $row)
+                     <div style="padding: 10px; border: 1px solid #ccc; min-width: 150px;">
+                         {{ $row['name'] }} - ({{ $row['level'] }})
+                    </div>
+            @endforeach
+                </div>
 
         <div class="mt-1">
             {{ $geoData->links() }}
@@ -56,6 +35,11 @@
     @elseif($searched)
         <p class="text-gray-600">No results found.</p>
     @endif
+
+@if($propertyCount > 0)
+    <p>{{ $propertyCount }} properties found</p>
+    @livewire('property-list')
+@endif
 
 </div>
 </div>

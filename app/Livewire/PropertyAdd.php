@@ -92,20 +92,27 @@ public function save()
    
         // ✅ Validate input
         $data = $this->validate();
+        
+       
 
         // ✅ Add user_id
         $data['user_id'] = Auth::id();
                  //dd($data);
         // ✅ Save main property
         $property = PropertyAdvertisement::create($data);
+        
        // ✅ Ask child to save pictures for this property
         $this->dispatch('savePictures', propertyId: $property->id)->to('property-images');
+         
 
         // Reset after save
         $this->reset();
+        
 
         session()->flash('success', 'Property advertisement created successfully!');
-        return redirect()->route('property-advertisements.index');
+
+        return $this->redirectRoute('dashboard');
+
     }
 
     public function render()

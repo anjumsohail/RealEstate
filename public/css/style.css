@@ -699,3 +699,18 @@ body {
     object-fit: cover; /* ensures fill while cropping */
     border-radius: 8px;
 }
+
+.dropdown-menu {
+    left: auto !important;
+    right: 0; /* Align to the right */
+}
+.dropdown-menu img {
+    max-width: 100%;
+    height: auto;
+}
+
+.dropdown-menu p,
+.dropdown-menu strong {
+    word-wrap: break-word;
+    white-space: normal;
+}

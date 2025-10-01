@@ -30,6 +30,7 @@ class UpdateGeometry extends Command
             ->when($id, fn($q) => $q->where('id', $id))
             ->whereNotNull('osm_relation_id')
             ->where('osm_relation_id', '>', 0)
+            ->whereRaw("ST_GeometryType(geometry) = 'POINT'")
             ->get();
 
         foreach ($query as $row) {

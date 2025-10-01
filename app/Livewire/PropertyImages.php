@@ -17,6 +17,7 @@ class PropertyImages extends Component
 
        public function savePictures($propertyId)
     {
+        
 //dd("Child received event with propertyId: " . $propertyId);
             $this->dispatch('console-log', message: 'Received Property ID '.$propertyId);
         logger()->info("Child savePictures called!", ['propertyId' => $propertyId]);
