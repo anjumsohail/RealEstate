@@ -1,4 +1,8 @@
 {
-  "image": "mcr.microsoft.com/devcontainers/php:0-8.1",
-  "features": {}
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-20.04",
+  "features": {"ghcr.io/devcontainers/features/php:1": {},
+  "ghcr.io/devcontainers-extra/features/mysql-homebrew:1": {},
+    "ghcr.io/devcontainers-extra/features/composer:1": {},
+    "ghcr.io/devcontainers-extra/features/tomcat-sdkman:2": {}
+  }
 }
