@@ -41,7 +41,7 @@
         #map { height: 500px; }
         .leaflet-draw-toolbar { z-index: 10000 !important; }
     </style>
-    
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
 
