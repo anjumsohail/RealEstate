@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 01, 2025 at 07:42 PM
+-- Generation Time: Oct 05, 2025 at 01:51 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -40,8 +40,11 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetGeoHierarchy` (IN `in_lat` DOUBL
         ST_Distance(ST_Centroid(c.geometry), @point) * 111.325 AS distance_km,
         CASE WHEN ST_Contains(c.geometry, @point) THEN 1 ELSE 0 END AS contains_point
     FROM cities c
-    WHERE MBRIntersects(c.geometry, ST_Buffer(@point, @buffer_radius))
-       OR ST_Contains(c.geometry, @point)
+    WHERE 
+	(MBRIntersects(c.geometry, ST_Buffer(@point, @buffer_radius))
+       and ST_Distance(ST_Centroid(c.geometry), @point) * 111.325 <5
+	   )
+	   	   OR ST_Contains(c.geometry, @point)
 
     UNION ALL
 
@@ -56,8 +59,12 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetGeoHierarchy` (IN `in_lat` DOUBL
         CASE WHEN ST_Contains(t.geometry, @point) THEN 1 ELSE 0 END
     FROM towns t
     JOIN geo_hierarchy gh ON gh.level = 'City' AND gh.id = t.city_id
-    WHERE MBRIntersects(t.geometry, ST_Buffer(@point, @buffer_radius))
-       OR ST_Contains(t.geometry, @point)
+    WHERE 
+	       (
+        MBRIntersects(t.geometry, ST_Buffer(@point, @buffer_radius))
+		    AND (ST_Distance(ST_Centroid(t.geometry), @point) * 111.325) < 5
+    )
+      OR ST_Contains(t.geometry, @point)
 
     UNION ALL
 
@@ -72,8 +79,11 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetGeoHierarchy` (IN `in_lat` DOUBL
         CASE WHEN ST_Contains(s.geometry, @point) THEN 1 ELSE 0 END
     FROM sectors s
     JOIN geo_hierarchy gh ON gh.level = 'Town' AND gh.id = s.town_id
-    WHERE MBRIntersects(s.geometry, ST_Buffer(@point, @buffer_radius))
-       OR ST_Contains(s.geometry, @point)
+    WHERE 
+	(MBRIntersects(s.geometry, ST_Buffer(@point, @buffer_radius))
+	   and ST_Distance(ST_Centroid(s.geometry), @point) * 111.325 <5
+	   )        OR ST_Contains(s.geometry, @point)
+
 
     UNION ALL
 
@@ -88,8 +98,11 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetGeoHierarchy` (IN `in_lat` DOUBL
         CASE WHEN ST_Contains(b.geometry, @point) THEN 1 ELSE 0 END
     FROM blocks b
     JOIN geo_hierarchy gh ON gh.level = 'Sector' AND gh.id = b.sector_id
-    WHERE MBRIntersects(b.geometry, ST_Buffer(@point, @buffer_radius))
-       OR ST_Contains(b.geometry, @point)
+    WHERE 
+	(MBRIntersects(b.geometry, ST_Buffer(@point, @buffer_radius))
+	   and ST_Distance(ST_Centroid(b.geometry), @point) * 111.325 <5
+	   )        OR ST_Contains(b.geometry, @point)
+
 )
 SELECT 
     level,
@@ -124,7 +137,10 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetPropertiesInArea` (IN `in_lat` D
         -- Cities
         SELECT 'City' AS level, c.id AS id, c.name AS name, NULL AS parent_id
         FROM cities c
-        WHERE MBRIntersects(c.geometry, ST_Buffer(@point, @buffer_radius))
+        WHERE (
+				MBRIntersects(c.geometry, ST_Buffer(@point, @buffer_radius))
+				and ST_Distance(ST_Centroid(c.geometry), @point) * 111.325 <5
+				)
            OR ST_Contains(c.geometry, @point)
 
         UNION ALL
@@ -133,7 +149,11 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetPropertiesInArea` (IN `in_lat` D
         SELECT 'Town', t.id, t.name, t.city_id
         FROM towns t
         JOIN geo_hierarchy gh ON gh.level = 'City' AND gh.id = t.city_id
-        WHERE MBRIntersects(t.geometry, ST_Buffer(@point, @buffer_radius))
+        WHERE 
+		(
+		MBRIntersects(t.geometry, ST_Buffer(@point, @buffer_radius))
+		and ST_Distance(ST_Centroid(t.geometry), @point) * 111.325 <5
+		)
            OR ST_Contains(t.geometry, @point)
 
         UNION ALL
@@ -142,7 +162,11 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetPropertiesInArea` (IN `in_lat` D
         SELECT 'Sector', s.id, s.name, s.town_id
         FROM sectors s
         JOIN geo_hierarchy gh ON gh.level = 'Town' AND gh.id = s.town_id
-        WHERE MBRIntersects(s.geometry, ST_Buffer(@point, @buffer_radius))
+        WHERE 
+		(
+		MBRIntersects(s.geometry, ST_Buffer(@point, @buffer_radius))
+		and ST_Distance(ST_Centroid(s.geometry), @point) * 111.325 <5
+		)
            OR ST_Contains(s.geometry, @point)
 
         UNION ALL
@@ -151,7 +175,10 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetPropertiesInArea` (IN `in_lat` D
         SELECT 'Block', b.id, b.name, b.sector_id
         FROM blocks b
         JOIN geo_hierarchy gh ON gh.level = 'Sector' AND gh.id = b.sector_id
-        WHERE MBRIntersects(b.geometry, ST_Buffer(@point, @buffer_radius))
+        WHERE (
+		MBRIntersects(b.geometry, ST_Buffer(@point, @buffer_radius))
+		and ST_Distance(ST_Centroid(b.geometry), @point) * 111.325 <5
+		)
            OR ST_Contains(b.geometry, @point)
     )
 
@@ -1765,8 +1792,8 @@ CREATE TABLE `cache` (
 --
 
 INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
-('pinspk_realestate_cache_356a192b7913b04c54574d18c28d46e6395428ab', 'i:1;', 1759338208),
-('pinspk_realestate_cache_356a192b7913b04c54574d18c28d46e6395428ab:timer', 'i:1759338208;', 1759338208);
+('pinspk_realestate_cache_356a192b7913b04c54574d18c28d46e6395428ab', 'i:1;', 1759665046),
+('pinspk_realestate_cache_356a192b7913b04c54574d18c28d46e6395428ab:timer', 'i:1759665046;', 1759665046);
 
 -- --------------------------------------------------------
 
@@ -1994,7 +2021,8 @@ CREATE TABLE `property_advertisements` (
 
 INSERT INTO `property_advertisements` (`id`, `city_id`, `town_id`, `sector_id`, `block_id`, `purpose`, `category`, `proptype`, `title`, `description`, `address`, `latitude`, `longitude`, `area_size`, `size_unit`, `positioning`, `front_face`, `back_site`, `demand_price`, `pricetype`, `floor`, `bedrooms`, `consage`, `conscond`, `postas`, `social`, `user_id`, `created_at`, `updated_at`) VALUES
 (53, 1, 13, 445, 870, 'Sale', 'Residential', 'Plot', 'Golden Urban house for Sell', 'Best Location', 'Main University Road Safoora', 24.9429278, 67.1591958, 240.00, 'Sqf', 'East Open', 'Main Road', 'Playgound', 12000.00, 'Total Price', NULL, '3', NULL, NULL, 'Individual', 'Y', 1, '2025-10-02 00:00:36', '2025-10-02 00:00:36'),
-(54, 1, 13, 17, 143, 'Rent', 'Residential', 'Plot', 'Golden Urban house for Rent', 'Good Location', 'Near Safoora', 24.9417890, 67.1628307, 250.00, 'Sqy', 'North Open', 'Apartment', 'Park', 18000.00, 'Own Price', NULL, '4', NULL, NULL, 'Individual', 'Y', 1, '2025-10-02 00:02:43', '2025-10-02 00:02:43');
+(54, 1, 13, 17, 143, 'Rent', 'Residential', 'Plot', 'Golden Urban house for Rent', 'Good Location', 'Near Safoora', 24.9417890, 67.1628307, 250.00, 'Sqy', 'North Open', 'Apartment', 'Park', 18000.00, 'Own Price', NULL, '4', NULL, NULL, 'Individual', 'Y', 1, '2025-10-02 00:02:43', '2025-10-02 00:02:43'),
+(55, 1, 13, 17, NULL, 'Sale', 'Residential', 'Plot', 'test', 'sdfasdf', 'asdfasdf', 24.9664487, 67.1724430, 240.00, 'Sqy', 'East Open', 'Commercial', 'Compound', 12000.00, 'Booking Price', NULL, NULL, NULL, NULL, 'Individual', 'Y', 1, '2025-10-05 06:50:19', '2025-10-05 06:50:19');
 
 -- --------------------------------------------------------
 
@@ -2017,7 +2045,10 @@ CREATE TABLE `property_pictures` (
 
 INSERT INTO `property_pictures` (`id`, `property_advertisement_id`, `title`, `image_path`, `created_at`, `updated_at`) VALUES
 (26, 53, 'Main Entry', 'property_images/YAEGMhjMavfhUKM9UWehBPRTP20yhaIYHg55lqWI.jpg', '2025-10-02 00:00:37', '2025-10-02 00:00:37'),
-(27, 54, 'Pool Side', 'property_images/OXVw3nvIOP5UFIjYv7cnur0psWbo1LWhA9mGOeiB.jpg', '2025-10-02 00:02:43', '2025-10-02 00:02:43');
+(27, 54, 'Pool Side', 'property_images/OXVw3nvIOP5UFIjYv7cnur0psWbo1LWhA9mGOeiB.jpg', '2025-10-02 00:02:43', '2025-10-02 00:02:43'),
+(28, 55, 'Main Side', 'property_images/d3vhL1b5BTiJRoOVOfQA1Sh1EavRptOUiv6WVR7c.jpg', '2025-10-05 06:50:19', '2025-10-05 06:50:19'),
+(29, 55, 'Front Side', 'property_images/OayvEIGdhoM29jOWz0tgE5C4C08p5EajzeebzneG.jpg', '2025-10-05 06:50:19', '2025-10-05 06:50:19'),
+(30, 55, 'Pool Side', 'property_images/GAGQwR1O5pKx3uWoKEV5qDwCIFwHscpNYZ7QrDn5.jpg', '2025-10-05 06:50:19', '2025-10-05 06:50:19');
 
 -- --------------------------------------------------------
 
@@ -2752,7 +2783,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('AkmYyNe2CfJ0kBTzMG7fhYOJl7f5ctBNmDg3YqBI', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiWXVKZkh1ZUlLUEl4QWprdnlKUFI1WFQ4QzZucG5FZ2p1RG1LZFVPSyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9wZXJ0eS9NYXBTZWFyY2giO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO3M6MjE6InBhc3N3b3JkX2hhc2hfc2FuY3R1bSI7czo2MDoiJDJ5JDEyJHMzeUVnUWxoTERHdDA0V0NUOUViYnVUazBnbXJuY3RockZHZEZlclVLWjhOcG93MnZBUnJtIjt9', 1759340406);
+('uSsw7DRSLuljqGXmdgRHmJnDzLomjWh1E9dmHJPp', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiMXh3SlhRRGlhVmE1RVU5U3ZjSFNLVGd6MHNZdEdRWFdZbE5YV1o5SiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9kYXNoYm9hcmQiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO3M6MjE6InBhc3N3b3JkX2hhc2hfc2FuY3R1bSI7czo2MDoiJDJ5JDEyJHMzeUVnUWxoTERHdDA0V0NUOUViYnVUazBnbXJuY3RockZHZEZlclVLWjhOcG93MnZBUnJtIjt9', 1759665019);
 
 -- --------------------------------------------------------
 
@@ -3115,13 +3146,13 @@ ALTER TABLE `personal_access_tokens`
 -- AUTO_INCREMENT for table `property_advertisements`
 --
 ALTER TABLE `property_advertisements`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT for table `property_pictures`
 --
 ALTER TABLE `property_pictures`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `sectors`
