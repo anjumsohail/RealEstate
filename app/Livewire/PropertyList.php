@@ -5,11 +5,11 @@ use Livewire\Component;
 class PropertyList extends Component
 {
     public $propertyCount;
-    public $properties = [];
+    public $properties;
 
 
     // This runs when component is instantiated
-    public function mount($propertyCount = 0, $properties = [])
+    public function mount($propertyCount = 0, $properties)
     {
         $this->propertyCount = $propertyCount;
         $this->properties = $properties;

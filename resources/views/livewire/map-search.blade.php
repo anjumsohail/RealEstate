@@ -20,25 +20,39 @@
 <div class="mt-2">
     
      {{-- Results --}}
-    @if($searched && $geoData->count())
+       <!-- Debug: Check what type geoData is -->
+    <div style="display: none;">
+        geoData type: {{ gettype($geoData) }}, 
+        is array: {{ is_array($geoData) ? 'yes' : 'no' }}, 
+        is object: {{ is_object($geoData) ? 'yes' : 'no' }},
+        class: {{ is_object($geoData) ? get_class($geoData) : 'not object' }}
+    </div>
+
+    @if($searched)
                <div class="boxes" style="display: flex; flex-wrap: wrap; gap: 10px;">
+
+          @if($geoCount > 0)
              @foreach($geoData as $row)
                      <div style="padding: 10px; border: 1px solid #ccc; min-width: 150px;">
                          {{ $row['name'] }} - ({{ $row['level'] }})
                     </div>
             @endforeach
+            @endif
                 </div>
 
         <div class="mt-1">
-            {{ $geoData->links() }}
+            {{-- Links --}}
+
         </div>
-    @elseif($searched)
-        <p class="text-gray-600">No results found.</p>
+
     @endif
 
 @if($propertyCount > 0)
     <p>{{ $propertyCount }} properties found</p>
-    @livewire('property-list')
+    @livewire('property-list', [
+    'propertyCount' => $propertyCount,
+    'properties' => $properties,    
+])
 @endif
 
 </div>

@@ -1,4 +1,13 @@
 <div id="PropertiesList" class="container-xxl">
+    <div style="display: none;">
+    @if($propertyCount > 0)
+     @foreach($properties as $property)
+     <p>{{$property->title}},</p>
+      @endforeach
+
+    @endif
+    </div>
+
 
     <div class="container">
         <div class="row g-0 gx-5 align-items-end">
