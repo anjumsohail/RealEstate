@@ -1,14 +1,4 @@
 <div id="PropertiesList" class="container-xxl">
-    <div style="display: none;">
-    @if($propertyCount > 0)
-     @foreach($properties as $property)
-     <p>{{$property->title}},</p>
-      @endforeach
-
-    @endif
-    </div>
-
-
     <div class="container">
         <div class="row g-0 gx-5 align-items-end">
             <div class="col-lg-6">
@@ -38,8 +28,9 @@
 
             <div id="tab-1" class="tab-pane fade show p-0 active">
                 <div class="row g-4">
-                   <livewire:property-item prop-type="1" />
-                    <livewire:property-item prop-type="2" />
+                    @foreach ($properties as $property)
+                    <livewire:property-item :propertyid="$property->id" :key="$property->id" />
+                    @endforeach
                     <!-- Browse More Button -->
                     <div class="col-12 text-center wow fadeInUp" data-wow-delay="0.1s">
                         <a class="btn btn-primary py-3 px-5" href="">Browse More Property</a>

@@ -2,15 +2,29 @@
 
 namespace App\Livewire;
 
+use App\Models\PropertyAdvertisement;
 use Livewire\Component;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PropertyItem extends Component
 {
-    public $propType="1";
+    public $propertyid;
+    public ?PropertyAdvertisement $property;
+    public $PicturesCount = 0;
 
-    public function mount($propType)
+    public function mount($propertyid)
     {
-        $this->propType=$propType;
+        $this->propertyid = $propertyid;
+        try {
+            $this->property = PropertyAdvertisement::with('pictures')
+                ->withCount('pictures')
+                ->findOrFail($this->propertyid);
+            $this->PicturesCount = $this->property->pictures_count;
+        } catch (ModelNotFoundException $e) {
+            // Handle gracefully
+            $this->property =  null;
+            $this->PicturesCount = 0;
+        }
     }
 
     public function render()

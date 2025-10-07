@@ -48,8 +48,8 @@
     @endif
 
 @if($propertyCount > 0)
-    <p>{{ $propertyCount }} properties found</p>
-    @livewire('property-list', [
+<p> Total {{$propertyCount}} Properties Found</p>
+@livewire('property-list', [
     'propertyCount' => $propertyCount,
     'properties' => $properties,    
 ])

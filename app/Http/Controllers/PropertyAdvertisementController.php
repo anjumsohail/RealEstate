@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Http\Requests\StorePropertyRequest;
 use App\Http\Resources\PropertyAdvertisementResource;
 use App\Models\PropertyAdvertisement;
@@ -35,7 +36,7 @@ class PropertyAdvertisementController extends Controller
 
     public function store(Request $request)
     {
-        
+
         //dd($request->all());  // pauses execution and shows data
         //$data = $request->validated();
         $data = $request->all();
@@ -43,20 +44,27 @@ class PropertyAdvertisementController extends Controller
         dd($data);  // pauses execution and shows data
         $property = PropertyAdvertisement::create($data);
 
-// Save pictures if uploaded
-    if ($request->hasFile('pictures')) {
-        foreach ($request->file('pictures') as $index => $file) {
-            $path = $file->store('property_images', 'public');
+        // Save pictures if uploaded
+        if ($request->hasFile('pictures')) {
+            foreach ($request->file('pictures') as $index => $file) {
+                $path = $file->store('property_images', 'public');
 
-            $property->pictures()->create([
-                'title'      => $request->picture_titles[$index] ?? null,
-                'image_path' => $path,
-            ]);
+                $property->pictures()->create([
+                    'title'      => $request->picture_titles[$index] ?? null,
+                    'image_path' => $path,
+                ]);
+            }
         }
-    }
 
-        
+
         return new PropertyAdvertisementResource($property->load('user.businessProfile'));
+    }
+    public function view($id)
+    {
+        $property = PropertyAdvertisement::with('pictures')
+            ->withCount('pictures')
+            ->findOrFail($id);
+        return view('pages.property-details', compact('$property'));
     }
 
     public function show(PropertyAdvertisement $propertyAdvertisement)
@@ -85,7 +93,7 @@ class PropertyAdvertisementController extends Controller
         return response()->json(['message' => 'Deleted successfully']);
     }
 
-       public function search(Request $request)
+    public function search(Request $request)
     {
         $query = PropertyAdvertisement::query();
 
@@ -123,5 +131,4 @@ class PropertyAdvertisementController extends Controller
         // Return to a view (replace 'properties.search_results' with your blade file)
         return view('properties.search_results', compact('properties'));
     }
-
 }

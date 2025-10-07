@@ -33,32 +33,33 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
     // ✅ Create a new property advertisement - only for authenticated users
 
-      Route::post('/property-advertisements/store', [PropertyAdvertisementController::class, 'store'])->name('property-advertisements.store');
-     //Route::post('/property-advertisements/store', function(StorePropertyRequest $request){dd($request->all());})->name('property-advertisements.store');
+    Route::post('/property-advertisements/store', [PropertyAdvertisementController::class, 'store'])->name('property-advertisements.store');
+    //Route::post('/property-advertisements/store', function(StorePropertyRequest $request){dd($request->all());})->name('property-advertisements.store');
 
     Route::get('/property-advertisements/index', [PropertyAdvertisementController::class, 'index'])
         ->name('property-advertisements.index');
- 
-
-        Route::resource('cities', CityController::class)->only(['index','show','store','update','destroy']);
-        Route::resource('towns', TownController::class)->only(['index','show','store','update','destroy']);
-        Route::resource('sectors', SectorController::class)->only(['index','show','store','update','destroy']);
-        Route::resource('blocks', BlockController::class)->only(['index','show','store','update','destroy']);
-
-        Route::get('/user/view', [UserController::class, 'index'])->name('profile.view');
-        Route::get('/user/properties', [UserController::class, 'UserProperties'])->name('property.myproperties');
-        Route::get('/user/edit', [UserController::class, 'edit'])->name('profile.edit');
-        Route::get('/property/add', [PropertyAdvertisementController::class, 'add'])->name('property.add');
-        Route::get('/property/MapSearch', [PropertyAdvertisementController::class, 'MapSearch'])->name('property.MapSearch');
 
 
+    Route::resource('cities', CityController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+    Route::resource('towns', TownController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+    Route::resource('sectors', SectorController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+    Route::resource('blocks', BlockController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+
+    Route::get('/user/view', [UserController::class, 'index'])->name('profile.view');
+    Route::get('/user/properties', [UserController::class, 'UserProperties'])->name('property.myproperties');
+    Route::get('/user/edit', [UserController::class, 'edit'])->name('profile.edit');
+    Route::get('/property/add', [PropertyAdvertisementController::class, 'add'])->name('property.add');
+    Route::get('/property/MapSearch', [PropertyAdvertisementController::class, 'MapSearch'])->name('property.MapSearch');
 });
 
 // ✅ Search properties - accessible to any user (guest or authenticated)
 Route::get('/property-advertisements/search', [PropertyAdvertisementController::class, 'search'])
     ->name('property-advertisements.search');
-    
-require __DIR__.'/auth.php';
+Route::get('/property-advertisements/view/{id}', [PropertyAdvertisementController::class, 'view'])
+    ->name('property-advertisements.view');
+
+
+require __DIR__ . '/auth.php';
 
 Route::middleware([
     'auth:sanctum',

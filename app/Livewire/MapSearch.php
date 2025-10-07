@@ -64,8 +64,7 @@ class MapSearch extends Component
 
         $results = DB::select($this->propertiesQuery());
 
-        $this->properties = \App\Models\PropertyAdvertisement::hydrate($results)
-            ->load(['city', 'pictures']);
+        $this->properties = \App\Models\PropertyAdvertisement::hydrate($results);
         $this->propertyCount = count($this->properties);
 
         $this->searched = true;
@@ -109,7 +108,7 @@ class MapSearch extends Component
         DB::statement("SET @point = ST_GeomFromText(CONCAT('POINT(', @longitude, ' ', @latitude, ')'), 4326)");
 
         $query = "
-        SELECT *
+        SELECT id
         FROM property_advertisements pa
         WHERE
             ST_Distance(
