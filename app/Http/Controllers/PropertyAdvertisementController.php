@@ -64,7 +64,7 @@ class PropertyAdvertisementController extends Controller
         $property = PropertyAdvertisement::with('pictures')
             ->withCount('pictures')
             ->findOrFail($id);
-        return view('pages.property-details', compact('$property'));
+        return view('pages.property-details', compact('property'));
     }
 
     public function show(PropertyAdvertisement $propertyAdvertisement)
