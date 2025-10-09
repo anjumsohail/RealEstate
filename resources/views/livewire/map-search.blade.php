@@ -85,11 +85,17 @@
 
         @endif
 
-        @if ($propertyCount > 0)
-            <p> Total {{ $propertyCount }} Properties Found</p>
+        @if ($geoCount > 0)
             @livewire('property-list', [
-                'propertyCount' => $propertyCount,
-                'properties' => $properties,
+                'searched' => $searched,
+                'filterCity' => $filterCity,
+                'filterTown' => $filterTown,
+                'filterSector' => $filterSector,
+                'filterBlock' => $filterBlock,
+                'filterProperty' => $filterProperty,
+                'latitude' => $latitude,
+                'longitude' => $longitude,
+                'radius' => $radius,
             ])
         @endif
 

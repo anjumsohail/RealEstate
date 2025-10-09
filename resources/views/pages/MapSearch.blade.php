@@ -27,11 +27,12 @@
                             @endif
 
                             <div class="mid_title">Map Search</div>
+                            <p> Find Property via Map - Draw the Circle Find Properties within that </p>
 
-                        @livewire('map-search')
-                            
+                            @livewire('map-search')
+
+                        </div>
                     </div>
-                </div>
                 </div>
             </section>
         </form>

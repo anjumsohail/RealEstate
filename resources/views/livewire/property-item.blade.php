@@ -14,6 +14,10 @@
                         <img class="d-block w-100 h-100" style="object-fit: cover;"
                             src="{{ $imageExists ? asset('storage/' . $picture->image_path) : asset('img/NoImage.jpg') }}"
                             alt="Property Image">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5>{{ $picture->title }}</h5>
+                        </div>
+
 
                     @empty
                         <img class="d-block w-100 h-100" style="object-fit: cover;" src="{{ asset('img/NoImage.jpg') }}"
