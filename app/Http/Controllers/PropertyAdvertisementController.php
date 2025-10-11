@@ -34,16 +34,11 @@ class PropertyAdvertisementController extends Controller
         return view('pages.MapSearch');
     }
 
-    public function store(Request $request)
+    public function store(StorePropertyRequest $request)
     {
-
-        //dd($request->all());  // pauses execution and shows data
-        //$data = $request->validated();
-        $data = $request->all();
+        $data = $request->validated();
         $data['user_id'] = Auth::id();
-        dd($data);  // pauses execution and shows data
         $property = PropertyAdvertisement::create($data);
-
         // Save pictures if uploaded
         if ($request->hasFile('pictures')) {
             foreach ($request->file('pictures') as $index => $file) {

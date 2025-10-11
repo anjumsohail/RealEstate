@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Requests;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -13,12 +14,12 @@ class StorePropertyRequest extends FormRequest
     {
         return true;
     }
-protected function prepareForValidation()
-{
-    $this->merge([
-        'user_id' => Auth::user()->id,
-    ]);
-}
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'user_id' => Auth::user()->id,
+        ]);
+    }
 
     /**
      * Get the validation rules that apply to the request.
@@ -27,7 +28,7 @@ protected function prepareForValidation()
      */
     public function rules(): array
     {
-      // dd(request()->all()); // or Log::info(request()->all());
+        // dd(request()->all()); // or Log::info(request()->all());
         return [
             'purpose' => 'required|in:Sale,Rent',
             'category' => 'required|in:Residential,Commercial',
@@ -47,21 +48,15 @@ protected function prepareForValidation()
             'front_face' => 'nullable|string|max:255',
             'back_site' => 'nullable|string|max:255',
             'demand_price' => 'required|numeric|min:0',
-
             // ✅ pictures are optional now
             'pictures'    => 'nullable',
             'pictures.*'  => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-
             // ✅ picture titles (optional, must be same count as pictures if provided)
             'picture_titles'   => 'nullable|array',
             'picture_titles.*' => 'nullable|string|max:255',
-
-            'floor'=> 'nullable|string|max:255',
-            'positioning'=> 'nullable|string|max:255',
-            'front_face'=> 'nullable|string|max:255',
-            'back_site' => 'nullable|string|max:255',
+            'floor' => 'nullable|string|max:255',
             'postas' => 'nullable|string|max:255',
-            'social'=> 'nullable|string|max:255',
+            'social' => 'nullable|string|max:255',
             'user_id' => 'required|exists:users,id'
         ];
     }

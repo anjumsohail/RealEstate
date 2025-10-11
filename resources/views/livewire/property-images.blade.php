@@ -26,7 +26,7 @@
                 <div class="p-2 border rounded shadow d-flex flex-column align-items-center">
 
                     {{-- Thumbnail Preview --}}
-                    @if ($picture)
+                    @if ($picture && method_exists($picture, 'temporaryUrl'))
                         <div class="thumb-box">
                             <img src="{{ $picture->temporaryUrl() }}" class="img-fluid rounded thumb-img"
                                 alt="Preview">

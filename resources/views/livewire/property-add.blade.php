@@ -649,6 +649,15 @@
                         </div>
                         <hr>
                         <!-- For success/fail messages -->
+                        @if (session('success') || session('error'))
+                            <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 9000)" x-show="show" x-transition
+                                class="alert alert-{{ session('success') ? 'success' : 'danger' }} alert-dismissible fade show"
+                                role="alert">
+                                {{ session('success') ?? session('error') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                            </div>
+                        @endif
                         <div class="btn-group" role="group" aria-label="...">
                             <button type="submit" class="btn-system border-btn btn-small btn-green">Submit
                                 New

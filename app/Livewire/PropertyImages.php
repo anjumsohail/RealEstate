@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Livewire;
+
 use Livewire\WithFileUploads;
 use Livewire\Component;
 use App\Models\PropertyPicture;
@@ -12,51 +13,61 @@ class PropertyImages extends Component
     public $pictures = [];
     public $picture_titles = [];
 
-   // 🔹 Listener for save
+    // 🔹 Listener for save
     protected $listeners = ['savePictures'];
 
-       public function savePictures($propertyId)
+    public function savePictures($propertyId)
     {
-        
-//dd("Child received event with propertyId: " . $propertyId);
-            $this->dispatch('console-log', message: 'Received Property ID '.$propertyId);
-        logger()->info("Child savePictures called!", ['propertyId' => $propertyId]);
-
-        foreach ($this->pictures as $index => $file) {
-                        if (!$file) {
-                                        logger()->warning("File at index $index is empty");
-                                         $this->dispatchBrowserEvent('console-log','No File at index' );
-                                         
-                                        continue;
-                                    }
-
-
-            $path = $file->store('property_images', 'public');
-
-             $this->dispatch('console-log', message: 'File Path '.$path);
-
-             // Delete temp file manually
-    if (method_exists($file, 'getRealPath') && file_exists($file->getRealPath())) {
-        @unlink($file->getRealPath());
-    }
-            PropertyPicture::create([
-                'property_advertisement_id' => $propertyId,
-                'image_path'  => $path,
-                'title'       => $this->picture_titles[$index] ?? null,
+        try {
+            // ✅ Validate pictures
+            $this->validate([
+                'pictures.*' => 'required|image|max:5120',
+                'picture_titles.*' => 'nullable|string|max:255',
             ]);
-logger()->info("Child savePictures Saved");
-    $this->dispatch('console-log', [
-    'pictures' => $path,
-    'titles'   => $this->picture_titles[$index],
-        ]);
 
+
+            foreach ($this->pictures as $index => $file) {
+                if (!$file) {
+                    throw new \Exception("File at index {$index} is empty.");
+                }
+
+                // ✅ Try storing file
+                $path = $file->store('property_images', 'public');
+                if (!$path) {
+                    throw new \Exception("Failed to store picture #{$index}");
+                }
+
+                // Delete temp file safely
+                if (method_exists($file, 'getRealPath') && file_exists($file->getRealPath())) {
+                    @unlink($file->getRealPath());
+                }
+
+                // ✅ Insert DB record
+                PropertyPicture::create([
+                    'property_advertisement_id' => $propertyId,
+                    'image_path' => $path,
+                    'title' => $this->picture_titles[$index] ?? null,
+                ]);
+            }
+
+            // ✅ Reset fields after success
+            $this->pictures = [];
+            $this->picture_titles = [];
+
+            logger()->info("Child savePictures success", ['propertyId' => $propertyId]);
+            $this->dispatch('picturesStatus', status: 'success', message: 'Child savePictures success');
+        } catch (\Throwable $e) {
+            logger()->error("Child savePictures failed", ['error' => $e->getMessage()]);
+            $this->reset(['pictures', 'picture_titles']);
+
+            // Dispatch event BEFORE returning
+            $this->dispatch('picturesStatus', status: 'error', message: $e->getMessage());
+
+            // ✅ Return instead of throw to prevent Livewire’s render bug
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-    $this->dispatch('console-log','Quit Saving' );
-    logger()->info("Quit Child Saving");
-        // Reset after saving
-        $this->pictures = [];
-        $this->picture_titles = [];
     }
+
 
     public function removePicture($index)
     {

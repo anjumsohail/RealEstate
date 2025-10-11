@@ -1,18 +1,21 @@
 <?php
 
 namespace App\Livewire;
+
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use App\Models\PropertyAdvertisement;
+use Livewire\Attributes\On;
+use App\Livewire\Throwable;
 
 class PropertyAdd extends Component
 {
 
-    public $purpose='';
+    public $purpose = '';
     public $category = '';
     public $proptype = '';
-    public $title='';
-    public $description='';
+    public $title = '';
+    public $description = '';
     public $address;
     public $city_id;
     public $town_id;
@@ -31,31 +34,30 @@ class PropertyAdd extends Component
     public $social;
     public $floor;
     public $bedrooms;
-    public $conscond; 
+    public $conscond;
     public $consage;
-
+    public $propertyId;
 
     // Listener to catch images forwarded from child
-    protected $listeners = ['MapUpdated','CitySelected'];
-   public function MapUpdated($coordinates)
-{
-    $lat = $coordinates['latitude'];
-    $lng = $coordinates['longitude'];
+    protected $listeners = ['MapUpdated', 'CitySelected'];
+    public function MapUpdated($coordinates)
+    {
+        $lat = $coordinates['latitude'];
+        $lng = $coordinates['longitude'];
 
-    $this->dispatch('log', message: "Latitude-Longitude: {$lat}, {$lng}");
+        $this->dispatch('log', message: "Latitude-Longitude: {$lat}, {$lng}");
 
-    $this->latitude  = $lat;
-    $this->longitude = $lng;
-}
-        public function CitySelected($CityParams)
+        $this->latitude  = $lat;
+        $this->longitude = $lng;
+    }
+    public function CitySelected($CityParams)
     {
 
-            $this->city_id=$CityParams['city_id'];
-            $this->town_id=$CityParams['town_id'];
-            $this->sector_id=$CityParams['sector_id'];
-            $this->block_id=$CityParams['block_id'];
-           $this->dispatch('log', message: json_encode($CityParams));
-
+        $this->city_id = $CityParams['city_id'];
+        $this->town_id = $CityParams['town_id'];
+        $this->sector_id = $CityParams['sector_id'];
+        $this->block_id = $CityParams['block_id'];
+        $this->dispatch('log', message: json_encode($CityParams));
     }
 
     protected $rules = [
@@ -85,34 +87,48 @@ class PropertyAdd extends Component
         'postas' => 'nullable|string|max:255',
         'social' => 'nullable|string|max:255',
 
+
     ];
 
-public function save()
+    public function save()
     {
-   
-        // ✅ Validate input
-        $data = $this->validate();
-        
-       
+        try {
+            // ✅ Validate input
 
-        // ✅ Add user_id
-        $data['user_id'] = Auth::id();
-                 //dd($data);
-        // ✅ Save main property
-        $property = PropertyAdvertisement::create($data);
-        
-       // ✅ Ask child to save pictures for this property
-        $this->dispatch('savePictures', propertyId: $property->id)->to('property-images');
-         
+            $data = $this->validate();
+            // ✅ Add user_id
+            $data['user_id'] = Auth::id();
+            // ✅ Save main property
+            $property = PropertyAdvertisement::create($data);
+            $this->propertyId = $property->id;
+            // ✅ Ask child to save pictures for this property
 
-        // Reset after save
-        $this->reset();
-        
+            $this->dispatch('savePictures', propertyId: $this->propertyId)->to('property-images');
+        } catch (\Throwable $e) {
+            // ❌ Roll back everything
+            logger()->error('Transaction failed', ['error' => $e->getMessage()]);
 
-        session()->flash('success', 'Property advertisement created successfully!');
+            session()->flash('error', 'Failed to save property. Please try again.');
+            return;
+        }
+    }
 
-        return $this->redirectRoute('dashboard');
+    #[On('picturesStatus')]
+    public function rollbackProperty($status, $message)
+    {
+        if ($status === 'success') {
+            $this->reset();
+            session()->flash('success', 'Property advertisement created successfully!');
 
+            return $this->redirectRoute('dashboard');
+        }
+
+        // rollback failed child upload
+        PropertyAdvertisement::find($this->propertyId)?->delete();
+
+        logger()->warning("Rolling back property due to failed image upload: $message");
+        session()->flash('error', "Failed to upload pictures: $message");
+        return;
     }
 
     public function render()

@@ -23,18 +23,18 @@
             </div>
         </div>
     </div>
-@if (session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-@endif
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
     <!-- Header End -->
     <!-- Search Start -->
     @livewire('property-search')
     <!-- Search End -->
-   <!-- About Start -->
+    <!-- About Start -->
     <div class="container-xxl py-5">
         <div class="container">
             <div class="row g-5 align-items-center">
@@ -45,19 +45,22 @@
                 </div>
                 <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
                     <h1 class="mb-4">Seamlessly Search with Our Map Search Feature</h1>
-                    <p class="mb-4">Our map search tool empowers you to browse listings based on their physical location.</p>
+                    <p class="mb-4">Our map search tool empowers you to browse listings based on their physical location.
+                    </p>
                     <p><i class="fa fa-check text-primary me-3"></i>Zoom in to a specific street</p>
-                    <p><i class="fa fa-check text-primary me-3"></i>draw a custom polygon around your desired neighborhood</p>
+                    <p><i class="fa fa-check text-primary me-3"></i>draw a custom polygon around your desired neighborhood
+                    </p>
                     <p><i class="fa fa-check text-primary me-3"></i>filter by a specific radius</p>
                     <p><i class="fa fa-check text-primary me-3"></i>Each property is marked with a clear pin</p>
-                    <p><i class="fa fa-check text-primary me-3"></i>Listing provide link to the full listing details, photos, and price</p>                    
+                    <p><i class="fa fa-check text-primary me-3"></i>Listing provide link to the full listing details,
+                        photos, and price</p>
                     <a class="btn btn-primary py-3 px-5 mt-3" href="{{ route('property.MapSearch') }}">Map Search</a>
                 </div>
             </div>
         </div>
     </div>
     <!-- About End -->
-        <!-- Category Start -->
+    <!-- Category Start -->
     <div class="container-xxl py-5">
         <div class="container">
             <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 600px;">
