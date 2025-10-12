@@ -87,6 +87,7 @@
 
         @if ($geoCount > 0)
             @livewire('property-list', [
+                'senderComponent' => $senderComponent,
                 'searched' => $searched,
                 'filterCity' => $filterCity,
                 'filterTown' => $filterTown,

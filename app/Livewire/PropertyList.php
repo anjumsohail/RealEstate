@@ -14,6 +14,7 @@ class PropertyList extends Component
 
     public $filterCity, $filterTown, $filterSector, $filterBlock, $filterProperty;
     public $latitude, $longitude, $radius;
+    public $senderComponent;
     public bool $searched = false;
 
     protected $listeners = ['performSearch'];
@@ -22,8 +23,8 @@ class PropertyList extends Component
     // This runs when component is instantiated
     public function performSearch($filters)
     {
+        $this->senderComponent = $filters['senderComponent'];
         $this->searched = $filters['searched'];
-
         $this->filterCity = $filters['filterCity'];
         $this->filterTown = $filters['filterTown'];
         $this->filterSector = $filters['filterSector'];

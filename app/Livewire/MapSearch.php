@@ -18,6 +18,7 @@ class MapSearch extends Component
     public $geoData = []; // Initialize as empty array
     public $MapData;
     public $searched = false;
+    public $senderComponent = "Map";
     public $geoCount = 0;
     //Filter Logic Variables
     public bool $filterCity = false;
@@ -49,6 +50,7 @@ class MapSearch extends Component
         $this->resetPage();
 
         $this->dispatch('performSearch', [
+            'senderComponent' => $this->senderComponent,
             'searched' => $this->searched,
             'filterCity' => $this->filterCity,
             'filterTown' => $this->filterTown,
@@ -113,6 +115,7 @@ class MapSearch extends Component
         // Emit event with all filters to the child component
         $this->searched = true;
         $this->dispatch('performSearch', [
+            'senderComponent' => $this->senderComponent,
             'searched' => $this->searched,
             'filterCity' => $this->filterCity,
             'filterTown' => $this->filterTown,
