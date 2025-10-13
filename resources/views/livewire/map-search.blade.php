@@ -85,7 +85,8 @@
 
         @endif
 
-        @if ($geoCount > 0)
+        {{-- Old Code
+            @if ($geoCount > 0)
             @livewire('property-list', [
                 'senderComponent' => $senderComponent,
                 'searched' => $searched,
@@ -97,6 +98,15 @@
                 'latitude' => $latitude,
                 'longitude' => $longitude,
                 'radius' => $radius,
+            ])
+        @endif
+        --}}
+
+        @if ($geoCount > 0)
+            @livewire('property-list', [
+                'senderComponent' => $senderComponent,
+                'searched' => $searched,
+                'listData' => $listData,
             ])
         @endif
 

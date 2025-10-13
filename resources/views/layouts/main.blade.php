@@ -34,12 +34,17 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
 
-<style>
-        #map { height: 500px; }
-        .leaflet-draw-toolbar { z-index: 10000 !important; }
+    <style>
+        #map {
+            height: 500px;
+        }
+
+        .leaflet-draw-toolbar {
+            z-index: 10000 !important;
+        }
     </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
@@ -47,8 +52,17 @@
 
 <body>
     @include('partials.header')
+    <!-- PropertyDetail overlay component (always in DOM) -->
+
     @yield('content')
     @include('partials.footer')
+
+    <!-- PropertyDetail overlay component - OUTSIDE normal flow -->
+    <livewire:property-detail />
+
+
+
+
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -61,7 +75,36 @@
     <script src="{{ asset('js/main.js') }}"></script>
 
     @livewireScripts
+    <!-- JavaScript for URL handling -->
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('showPropertyDetail', () => {
+                document.body.classList.add('modal-open');
+            });
+
+            Livewire.on('closePropertyDetail', () => {
+                document.body.classList.remove('modal-open');
+            });
+        });
+
+        document.addEventListener('livewire:initialized', () => {
+
+            // Handle browser back button
+            window.addEventListener('popstate', function(event) {
+                Livewire.dispatch('closePropertyDetail');
+            });
+
+            // Handle escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    Livewire.dispatch('closePropertyDetail');
+                }
+            });
+        });
+    </script>
+
     @stack('scripts')
+
 </body>
 
 </html>

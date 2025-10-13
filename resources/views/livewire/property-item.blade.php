@@ -6,7 +6,7 @@
             <!-- ✅ Fixed Ratio Wrapper -->
             <div class="position-relative overflow-hidden" style="aspect-ratio: 16 / 9;">
 
-                <a href="{{ route('property-advertisements.view', ['id' => $property->id]) }}">
+                <div wire:click="showDetail" class="cursor-pointer hover:shadow-lg transition">
                     @forelse ($property->pictures as $picture)
                         @php
                             $imageExists = Storage::disk('public')->exists($picture->image_path);
@@ -23,7 +23,7 @@
                         <img class="d-block w-100 h-100" style="object-fit: cover;" src="{{ asset('img/NoImage.jpg') }}"
                             alt="No image available">
                     @endforelse
-                </a>
+                </div>
                 <div class="bg-primary rounded text-white position-absolute start-0 top-0 m-4 py-1 px-3">
                     {{ $property->purpose }}
                 </div>

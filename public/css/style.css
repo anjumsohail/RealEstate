@@ -715,3 +715,6 @@ body {
     white-space: normal;
 }
 
+body.modal-open {
+        overflow: hidden;
+    }

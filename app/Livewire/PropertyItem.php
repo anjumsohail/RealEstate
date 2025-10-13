@@ -27,6 +27,12 @@ class PropertyItem extends Component
         }
     }
 
+    public function showDetail()
+    {
+        // Emit event to parent components and PropertyDetail component
+        $this->dispatch('showPropertyDetail', propertyId: $this->property->id);
+    }
+
     public function render()
     {
         return view('livewire.property-item');

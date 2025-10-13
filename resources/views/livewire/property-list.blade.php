@@ -1,5 +1,7 @@
 <div id="PropertiesList" class="container-xxl">
+
     @if ($searched)
+
         <div class="container">
             <div class="row g-0 gx-5 align-items-end">
                 <div class="col-lg-6">
@@ -73,7 +75,6 @@
                 </div>
 
             </div>
-
 
         </div>
 </div>

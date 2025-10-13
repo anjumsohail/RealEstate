@@ -6,7 +6,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Barryvdh\Debugbar\Facades\Debugbar;
+use App\Models\PropertyAdvertisement;
+use Illuminate\Database\Eloquent\Builder;
+
 
 class MapSearch extends Component
 {
@@ -16,6 +18,7 @@ class MapSearch extends Component
     public $longitude = 67.1541;
     public $radius = 10;
     public $geoData = []; // Initialize as empty array
+    public $listData = [];
     public $MapData;
     public $searched = false;
     public $senderComponent = "Map";
@@ -28,6 +31,22 @@ class MapSearch extends Component
     public bool $filterProperty = true;
 
     protected $queryString = ['page'];
+
+
+
+    public function search()
+    {
+        $this->fetchGeoHierarchy();
+        $this->fetchMapData();
+        $this->dispatchMapData();
+
+        $this->searched = true;
+
+        $this->fetchListData();
+        $this->dispatchListData();
+
+        $this->resetPage();
+    }
 
     public function setCoordinates($latitude, $longitude)
     {
@@ -49,30 +68,21 @@ class MapSearch extends Component
         $this->searched = false;
         $this->resetPage();
 
+        $this->listData = [];
         $this->dispatch('performSearch', [
             'senderComponent' => $this->senderComponent,
             'searched' => $this->searched,
-            'filterCity' => $this->filterCity,
-            'filterTown' => $this->filterTown,
-            'filterSector' => $this->filterSector,
-            'filterBlock' => $this->filterBlock,
-            'filterProperty' => $this->filterProperty,
-            'latitude' => $this->latitude,
-            'longitude' => $this->longitude,
-            'radius' => $this->radius,
+            'listData' => $this->listData,
         ])->to('property-list'); // <- component name
     }
 
-    public function search()
+    private function fetchGeoHierarchy()
     {
-
         $rows = DB::select("CALL GetGeoHierarchy(?, ?, ?)", [
             $this->latitude,
             $this->longitude,
             $this->radius,
         ]);
-
-        Debugbar::info($rows);
 
         $this->geoData = collect($rows)->map(function ($row) {
             return [
@@ -80,56 +90,70 @@ class MapSearch extends Component
                 'name'  => $row->name,
             ];
         })->values()->all();
-        $this->geoCount = count($this->geoData);
 
+        $this->geoCount = count($this->geoData);
+    }
+
+    private function fetchMapData()
+    {
         $results = DB::select(
             "
-            SELECT id,title,purpose,proptype,latitude,longitude FROM property_advertisements pa
-            WHERE ST_Distance( ST_GeomFromText(CONCAT('POINT(', pa.longitude, ' ', pa.latitude, ')'), 4326),
-                    ST_GeomFromText(CONCAT('POINT(', ?, ' ', ? ,')'), 4326) ) * 111.325 <= ?",
+        SELECT id, title, purpose, proptype, latitude, longitude
+        FROM property_advertisements pa
+        WHERE ST_Distance(
+            ST_GeomFromText(CONCAT('POINT(', pa.longitude, ' ', pa.latitude, ')'), 4326),
+            ST_GeomFromText(CONCAT('POINT(', ?, ' ', ? ,')'), 4326)
+        ) * 111.325 <= ?
+        ",
             [
-                $this->longitude,  // first ? → your reference longitude
-                $this->latitude,   // second ? → your reference latitude
-                $this->radius      // third ? → search radius in kilometers
+                $this->longitude,
+                $this->latitude,
+                $this->radius,
             ]
         );
 
         $this->MapData = \App\Models\PropertyAdvertisement::hydrate($results);
-        // Emit to JS
-        // ✅ Convert to simple array
+    }
+
+    private function dispatchMapData()
+    {
         $payload = $this->MapData->map(function ($item) {
             return [
-                'id' => $item->id,
-                'title' => $item->title,
-                'purpose' => $item->purpose,
-                'proptype' => $item->proptype,
-                'latitude' => (float) $item->latitude,
+                'id'        => $item->id,
+                'title'     => $item->title,
+                'purpose'   => $item->purpose,
+                'proptype'  => $item->proptype,
+                'latitude'  => (float) $item->latitude,
                 'longitude' => (float) $item->longitude,
             ];
         })->values()->toArray();
 
-        // ✅ Dispatch clean array to frontend
         $this->dispatch('mapDataUpdated', $payload);
-        $this->dispatch('mapDataUpdated', ...[$payload]);
+    }
 
-        // Emit event with all filters to the child component
-        $this->searched = true;
+    private function fetchListData()
+    {
+        $query = $this->propertiesQuery(
+            $this->filterCity,
+            $this->filterTown,
+            $this->filterSector,
+            $this->filterBlock,
+            $this->filterProperty,
+            $this->latitude,
+            $this->longitude,
+            $this->radius
+        );
+
+        $this->listData = $query->pluck('id')->toArray();
+    }
+
+    private function dispatchListData()
+    {
         $this->dispatch('performSearch', [
             'senderComponent' => $this->senderComponent,
             'searched' => $this->searched,
-            'filterCity' => $this->filterCity,
-            'filterTown' => $this->filterTown,
-            'filterSector' => $this->filterSector,
-            'filterBlock' => $this->filterBlock,
-            'filterProperty' => $this->filterProperty,
-            'latitude' => $this->latitude,
-            'longitude' => $this->longitude,
-            'radius' => $this->radius,
-        ])->to('property-list'); // <- component name
-
-
-
-        $this->resetPage();
+            'listData' => $this->listData,
+        ])->to('property-list');
     }
 
     // FIX: Change to regular method and call it explicitly
@@ -137,7 +161,6 @@ class MapSearch extends Component
     {
         $perPage = 15;
         $currentPage = request()->query('page', 1);
-
         if ($this->searched && !empty($this->geoData)) {
             $collection = collect($this->geoData);
             $items = $collection->slice(($currentPage - 1) * $perPage, $perPage)->values();
@@ -146,7 +169,6 @@ class MapSearch extends Component
             $items = [];
             $total = 0;
         }
-
         return new LengthAwarePaginator(
             $items,
             $total,
@@ -159,6 +181,112 @@ class MapSearch extends Component
         );
     }
 
+
+    public function propertiesQuery(
+        bool $filterCity = false,
+        bool $filterTown = false,
+        bool $filterSector = false,
+        bool $filterBlock = false,
+        bool $filterProperty = false,
+        $latitude,
+        $longitude,
+        $radius
+    ): Builder {
+        $query = PropertyAdvertisement::query();
+
+        $bufferRadius = $radius / 111.325;
+        $lat = $latitude;
+        $lng = $longitude;
+        $point = "ST_GeomFromText('POINT($lng $lat)', 4326)";
+
+        // If no filters selected or not searched, return no results
+        if (
+            (
+                !$filterCity &&
+                !$filterTown &&
+                !$filterSector &&
+                !$filterBlock &&
+                !$filterProperty
+            ) || !$this->searched
+        ) {
+            $query->whereRaw('0 = 1');
+            return $query->select('id');
+        }
+
+        // Wrap all filters in a where() group with orWhere() logic
+        $query->where(function ($q) use (
+            $filterCity,
+            $filterTown,
+            $filterSector,
+            $filterBlock,
+            $filterProperty,
+            $point,
+            $bufferRadius,
+            $radius
+        ) {
+            // Nearby property filter
+            if ($filterProperty) {
+                $q->orWhereRaw("
+                ST_Distance(
+                    ST_GeomFromText(CONCAT('POINT(', longitude, ' ', latitude, ')'), 4326),
+                    $point
+                ) * 111.325 <= ?
+            ", [$radius]);
+            }
+
+            // City filter
+            if ($filterCity) {
+                $q->orWhereIn('city_id', function ($sub) use ($point, $bufferRadius) {
+                    $sub->select('id')->from('cities')
+                        ->whereRaw("(
+                        (MBRIntersects(geometry, ST_Buffer($point, ?)) AND
+                        ST_Distance(ST_Centroid(geometry), $point) * 111.325 < 5)
+                        OR ST_Contains(geometry, $point)
+                    )", [$bufferRadius]);
+                });
+            }
+
+            // Town filter
+            if ($filterTown) {
+                $q->orWhereIn('town_id', function ($sub) use ($point, $bufferRadius) {
+                    $sub->select('id')->from('towns')
+                        ->whereRaw("(
+                        (MBRIntersects(geometry, ST_Buffer($point, ?)) AND
+                        ST_Distance(ST_Centroid(geometry), $point) * 111.325 < 5)
+                        OR ST_Contains(geometry, $point)
+                    )", [$bufferRadius]);
+                });
+            }
+
+            // Sector filter
+            if ($filterSector) {
+                $q->orWhereIn('sector_id', function ($sub) use ($point, $bufferRadius) {
+                    $sub->select('id')->from('sectors')
+                        ->whereRaw("(
+                        (MBRIntersects(geometry, ST_Buffer($point, ?)) AND
+                        ST_Distance(ST_Centroid(geometry), $point) * 111.325 < 5)
+                        OR ST_Contains(geometry, $point)
+                    )", [$bufferRadius]);
+                });
+            }
+
+            // Block filter
+            if ($filterBlock) {
+                $q->orWhereIn('block_id', function ($sub) use ($point, $bufferRadius) {
+                    $sub->select('id')->from('blocks')
+                        ->whereRaw("(
+                        (MBRIntersects(geometry, ST_Buffer($point, ?)) AND
+                        ST_Distance(ST_Centroid(geometry), $point) * 111.325 < 5)
+                        OR ST_Contains(geometry, $point)
+                    )", [$bufferRadius]);
+                });
+            }
+        });
+
+        return $query->select('id');
+    }
+
+    protected $listeners = ['showPropertyDetail'];
     public function render()
     {
         // FIX: Call the method explicitly to get the Paginator object

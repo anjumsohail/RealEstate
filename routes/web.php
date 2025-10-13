@@ -8,8 +8,6 @@ use App\Http\Controllers\TownController;
 use App\Http\Controllers\SectorController;
 use App\Http\Controllers\BlockController;
 use App\Http\Controllers\UserController;
-use App\Http\Requests\StorePropertyRequest;
-use Illuminate\Http\Request;
 
 
 Route::get('/', function () {
@@ -57,6 +55,9 @@ Route::get('/property-advertisements/search', [PropertyAdvertisementController::
     ->name('property-advertisements.search');
 Route::get('/property-advertisements/view/{id}', [PropertyAdvertisementController::class, 'view'])
     ->name('property-advertisements.view');
+Route::get('/property/{property}', function (App\Models\PropertyAdvertisement $property) {
+    return view('property-detail-page', ['property' => $property]);
+})->name('property.detail');
 
 
 require __DIR__ . '/auth.php';
