@@ -13,13 +13,11 @@ class PropertyList extends Component
     use WithPagination;
 
     public $senderComponent;
-    public $listData=[];
+    public $listData = [];
     public bool $searched = false;
 
+
     protected $listeners = ['performSearch'];
-
-
-    // This runs when component is instantiated
     public function performSearch($filters)
     {
         $this->senderComponent = $filters['senderComponent'];
@@ -28,7 +26,6 @@ class PropertyList extends Component
 
         $this->resetPage(); // reset pagination
     }
-
 
     public function render()
     {

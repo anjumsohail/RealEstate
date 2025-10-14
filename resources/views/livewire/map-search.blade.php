@@ -102,13 +102,13 @@
         @endif
         --}}
 
-        @if ($geoCount > 0)
-            @livewire('property-list', [
-                'senderComponent' => $senderComponent,
-                'searched' => $searched,
-                'listData' => $listData,
-            ])
-        @endif
+
+        @livewire('property-list', [
+            'senderComponent' => $senderComponent,
+            'searched' => $searched,
+            'listData' => $listData,
+        ])
+
 
     </div>
 </div>
@@ -216,7 +216,7 @@
                 <strong>${item.title}</strong><br>
                 Purpose: ${item.purpose}<br>
                 Type: ${item.proptype}<br>
-                <a href="/property-advertisements/view/${item.id}" target="_blank" class="btn btn-sm btn-primary mt-1">View Details</a>
+                <a href="javascript:void(0)" onclick="window.showPropertyDetail(${item.id})" class="btn btn-sm btn-primary mt-1">View Details</a>
             </div>
         `);
                 });
@@ -231,5 +231,11 @@
 
 
         });
+        // Add this global function
+        window.showPropertyDetail = function(propertyId) {
+            Livewire.dispatch('showPropertyDetail', {
+                propertyId: propertyId
+            });
+        };
     </script>
 @endpush

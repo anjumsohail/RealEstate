@@ -14,10 +14,18 @@ class PropertyDetail extends Component
 
     public function showPropertyDetail($propertyId)
     {
-        $this->property = PropertyAdvertisement::with('pictures')->find($propertyId);
+        $this->property = PropertyAdvertisement::with('pictures', 'city', 'town', 'sector', 'block')->find($propertyId);
         $this->showModal = true;
+        // Dispatch with property data payload
+        $this->dispatch('modal-opened', [
+            'MapData' => [
+                'lat' => $this->property->latitude, // Adjust field names as needed
+                'long' => $this->property->longitude,
+                'radius' => 0,
+                'title' => $this->property->title
+            ]
+        ]);
 
-        $this->dispatch('modal-opened'); // Add this
         $this->js('window.dispatchEvent(new CustomEvent("modal-opened"))');
     }
 
@@ -29,6 +37,7 @@ class PropertyDetail extends Component
         // Reset URL back to search
         $this->dispatch('reset-url');
         $this->dispatch('modal-closed'); // Add this
+
     }
 
     public function render()

@@ -32,7 +32,7 @@ class SelectionComponent extends Component
     }
 
     public function updatedSelectedCity($value)
-    {    
+    {
         //$this->dispatch('log', ['message' => 'City updated: '.$value]);
         // $this->dispatch('log', message: "City changed to ID $value");
 
@@ -42,12 +42,13 @@ class SelectionComponent extends Component
         $this->selectedSector = null;
         $this->blocks = [];
         $this->selectedBlock = null;
-           
-        $this->dispatch('CitySelected', [
+
+
+        $this->dispatch('geographySelected', [
             'city_id' => $value,
             'town_id' => $this->selectedTown,
-            'sector_id'=>$this->selectedSector,
-            'block_id'=>$this->selectedBlock
+            'sector_id' => $this->selectedSector,
+            'block_id' => $this->selectedBlock
         ]);
     }
 
@@ -57,40 +58,40 @@ class SelectionComponent extends Component
         $this->selectedSector = $this->selectedBlock = null;
         $this->blocks = [];
 
-                $this->dispatch('CitySelected', [
+        $this->dispatch('geographySelected', [
             'town_id' => $value,
             'city_id' => $this->selectedCity,
-            'sector_id'=>$this->selectedSector,
-            'block_id'=>$this->selectedBlock
+            'sector_id' => $this->selectedSector,
+            'block_id' => $this->selectedBlock
         ]);
     }
 
     public function updatedSelectedSector($value)
-    { 
+    {
         $this->blocks = Block::where('sector_id', $value)->orderBy('name')->get();
         $this->selectedBlock = null;
 
-         $this->dispatch('CitySelected', [
+        $this->dispatch('geographySelected', [
             'city_id' => $this->selectedCity,
             'town_id' => $this->selectedTown,
-            'sector_id'=>$value,
-            'block_id'=>$this->selectedBlock
+            'sector_id' => $value,
+            'block_id' => $this->selectedBlock
         ]);
     }
 
     public function updatedSelectedBlock($value)
-{
-    $this->selectedBlock = $value; // update immediately
+    {
+        $this->selectedBlock = $value; // update immediately
 
-    //$this->dispatch('log', message: "Block ID changed to ID $value");
+        //$this->dispatch('log', message: "Block ID changed to ID $value");
 
-    $this->dispatch('CitySelected', [
-        'city_id'   => $this->selectedCity,
-        'town_id'   => $this->selectedTown,
-        'sector_id' => $this->selectedSector,
-        'block_id'  => $value,   // use $value directly
-    ]);
-}
+        $this->dispatch('geographySelected', [
+            'city_id'   => $this->selectedCity,
+            'town_id'   => $this->selectedTown,
+            'sector_id' => $this->selectedSector,
+            'block_id'  => $value,   // use $value directly
+        ]);
+    }
 
     public function search()
     {

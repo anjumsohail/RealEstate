@@ -78,29 +78,74 @@
     <!-- JavaScript for URL handling -->
     <script>
         document.addEventListener('livewire:initialized', () => {
-            Livewire.on('showPropertyDetail', () => {
-                document.body.classList.add('modal-open');
-            });
-
-            Livewire.on('closePropertyDetail', () => {
+            // Function to enable scrolling
+            function enableBodyScroll() {
+                document.body.style.overflow = '';
+                document.body.style.overflowX = '';
+                document.body.style.overflowY = '';
+                document.body.style.height = '';
+                document.body.style.position = '';
                 document.body.classList.remove('modal-open');
-            });
-        });
 
-        document.addEventListener('livewire:initialized', () => {
+                // Also reset html element
+                document.documentElement.style.overflow = '';
+                document.documentElement.style.overflowX = '';
+                document.documentElement.style.overflowY = '';
+            }
+
+            // Function to disable scrolling
+            function disableBodyScroll() {
+                document.body.style.overflow = 'hidden';
+                document.body.style.height = '100vh';
+                document.body.classList.add('modal-open');
+            }
+
+            // Listen for modal events
+            Livewire.on('modal-opened', () => {
+
+                disableBodyScroll();
+            });
+
+            Livewire.on('modal-closed', () => {
+
+                enableBodyScroll();
+            });
+
+            // Handle escape key - directly call the component method
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    const propertyDetailComponent = Object.values(Livewire.components.components()).find(
+                        component =>
+                        component.name.includes('PropertyDetail')
+                    );
+                    if (propertyDetailComponent) {
+                        propertyDetailComponent.$wire.closePropertyDetail();
+                    }
+                }
+            });
 
             // Handle browser back button
             window.addEventListener('popstate', function(event) {
-                Livewire.dispatch('closePropertyDetail');
-            });
-
-            // Handle escape key
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    Livewire.dispatch('closePropertyDetail');
+                enableBodyScroll();
+                const propertyDetailComponent = Object.values(Livewire.components.components()).find(
+                    component =>
+                    component.name.includes('PropertyDetail')
+                );
+                if (propertyDetailComponent && propertyDetailComponent.$wire.showModal) {
+                    propertyDetailComponent.$wire.closePropertyDetail();
                 }
             });
+
+            // Always enable scroll on page load
+            enableBodyScroll();
         });
+
+        // Emergency scroll fix - call this in console if needed
+        window.fixScroll = function() {
+            document.body.style.overflow = 'auto';
+            document.body.style.height = 'auto';
+            document.body.classList.remove('modal-open');
+        };
     </script>
 
     @stack('scripts')

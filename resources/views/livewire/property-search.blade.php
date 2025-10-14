@@ -5,10 +5,10 @@
                 <div class="col-md-6">
                     <label class="fw-bold me-2">Purpose:</label>
                     <label class="radio-inline">
-                        <input type="radio" name="propfor" value="Sale" onclick="getSaleProp(this.value);"> For Sale
+                        <input type="radio" wire:model="propfor" name="propfor" value="Sale"> For Sale
                     </label>
                     <label class="radio-inline">
-                        <input type="radio" name="propfor" value="Rent" onclick="getSaleProp(this.value);"> For Rent
+                        <input type="radio" wire:model="propfor" name="propfor" value="Rent"> For Rent
                     </label>
                 </div>
 
@@ -16,21 +16,21 @@
                 <div class="col-md-6">
                     <label class="fw-bold me-2">Type:</label>
                     <label class="radio-inline">
-                        <input type="radio" name="proptype" value="Plot" onclick="getTypeProp(this.value);"> Plot
+                        <input type="radio" wire:model="proptype" name="proptype" value="Plot"> Plot
                     </label>
                     <label class="radio-inline">
-                        <input type="radio" name="proptype" value="Home" onclick="getTypeProp(this.value);"> Home
+                        <input type="radio" wire:model="proptype" name="proptype" value="Home"> Home
                     </label>
                     <label class="radio-inline">
-                        <input type="radio" name="proptype" value="Apartment" onclick="getTypeProp(this.value);">
+                        <input type="radio" wire:model="proptype" name="proptype" value="Apartment">
                         Apartment
                     </label>
                     <label class="radio-inline">
-                        <input type="radio" name="proptype" value="Portion" onclick="getTypeProp(this.value);">
+                        <input type="radio" wire:model="proptype" name="proptype" value="Portion">
                         Portion
                     </label>
                     <label class="radio-inline">
-                        <input type="radio" name="proptype" value="Cottage" onclick="getTypeProp(this.value);">
+                        <input type="radio" wire:model="proptype" name="proptype" value="Cottage">
                         Cottage
                     </label>
                 </div>
@@ -41,7 +41,9 @@
                 @livewire('selection-component', ['columnClass' => 'col-md-10'])
                 <!-- Selection End -->
                 <div class="col-md-2">
-                    <button class="btn btn-dark border-0 w-100 py-3">Search</button>
+                    <button wire:click="search" class="btn btn-dark border-0 w-100 py-3">Search</button>
+
+
                 </div>
             </div>
         </div>

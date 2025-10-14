@@ -39,7 +39,7 @@ class PropertyAdd extends Component
     public $propertyId;
 
     // Listener to catch images forwarded from child
-    protected $listeners = ['MapUpdated', 'CitySelected'];
+    protected $listeners = ['MapUpdated', 'geographySelected'];
     public function MapUpdated($coordinates)
     {
         $lat = $coordinates['latitude'];
@@ -50,7 +50,7 @@ class PropertyAdd extends Component
         $this->latitude  = $lat;
         $this->longitude = $lng;
     }
-    public function CitySelected($CityParams)
+    public function geographySelected($CityParams)
     {
 
         $this->city_id = $CityParams['city_id'];

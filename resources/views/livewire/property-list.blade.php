@@ -79,34 +79,55 @@
         </div>
 </div>
 </div>
-@push('scripts')
-    <script>
-        document.querySelectorAll('a[data-bs-toggle="pill"]').forEach(tab => {
-            tab.addEventListener('shown.bs.tab', event => {
-                const targetPaneSelector = tab.getAttribute('href');
-                const targetPane = document.querySelector(targetPaneSelector);
-                if (!targetPane) return;
-
-                const carouselEl = targetPane.querySelector('.carousel');
-                const element = document.getElementById("PropertiesList");
-                element.scrollIntoView();
-
-
-                if (carouselEl) {
-
-                    console.log("Carosel");
-                    let carousel = bootstrap.Carousel.getInstance(carouselEl);
-                    if (!carousel) {
-                        carousel = new bootstrap.Carousel(carouselEl, {
-                            ride: 'carousel'
-                        });
-                    }
-                    carousel.to(0); // reset first slide
-                    carousel.cycle(); // start auto-sliding
-                }
-            });
-        });
-    </script>
-@endpush
 @endif
 </div>
+@script
+    <script>
+        /*
+                1. Scrolls the page to show your property list component
+                2. Resets and restarts any carousels inside the newly shown tab
+                3. Ensures carousels auto-play when their tab becomes active
+                document.querySelectorAll('a[data-bs-toggle="pill"]').forEach(tab => {
+                    tab.addEventListener('shown.bs.tab', event => {
+                        const targetPaneSelector = tab.getAttribute('href');
+                        const targetPane = document.querySelector(targetPaneSelector);
+                        if (!targetPane) return;
+
+                        const carouselEl = targetPane.querySelector('.carousel');
+                        const element = document.getElementById("PropertiesList");
+
+                        element.scrollIntoView();
+
+
+                        if (carouselEl) {
+
+                            console.log("Carosel");
+                            let carousel = bootstrap.Carousel.getInstance(carouselEl);
+                            if (!carousel) {
+                                carousel = new bootstrap.Carousel(carouselEl, {
+                                    ride: 'carousel'
+                                });
+                            }
+                            carousel.to(0); // reset first slide
+                            carousel.cycle(); // start auto-sliding
+                        }
+                    });
+                });
+
+                */
+        // Scroll to component when search is performed
+        $wire.on('performSearch', () => {
+
+            setTimeout(() => {
+                const element = document.getElementById('PropertiesList');
+
+                if (element) {
+                    element.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }, 100);
+        });
+    </script>
+@endscript
