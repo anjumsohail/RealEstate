@@ -8,12 +8,25 @@ class BusinessUser extends Model
 {
     //    
     protected $fillable = [
-        'user_id', 'business_nature', 'company_name', 'company_description',
-        'designation', 'city', 'services', 'facebook_url', 'youtube_url', 'linkedin_url',
-        'latitude', 'longitude'
+        'user_id',
+        'business_nature',
+        'company_name',
+        'company_description',
+        'designation',
+        'city',
+        'services',
+        'facebook_url',
+        'youtube_url',
+        'linkedin_url',
+        'latitude',
+        'longitude'
     ];
 
-    public function user() {
+    protected $casts = [
+        'services' => 'array',
+    ];
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 }

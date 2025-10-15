@@ -1,8 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\User;
+
 namespace App\Http\Controllers;
+
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
@@ -20,21 +23,23 @@ class UserController extends Controller
         if (Auth::user()->role !== 'Admin') {
             $user = User::with(['businessProfile', 'properties'])->findOrFail(Auth::id());
         }
-       return view('pages.user', compact('user'));
+        return view('pages.user', compact('user'));
     }
 
     public function UserProperties()
     {
-             //if (Auth::user()->role !== 'Admin') {
-//            $user = User::with(['businessProfile', 'properties'])->findOrFail(Auth::id());        }
-       return view('pages.userproperties');
+        //if (Auth::user()->role !== 'Admin') {
+        //            $user = User::with(['businessProfile', 'properties'])->findOrFail(Auth::id());        }
+        return view('pages.userproperties');
     }
 
-    
-   public function edit()
+
+    public function edit()
     {
-   $user = User::with(['businessProfile', 'properties'])->findOrFail(Auth::id());
-    return view('pages.profile', compact('user'));
+        $user = User::with(['businessProfile', 'properties'])->findOrFail(Auth::id());
+        $cities = \App\Models\City::orderBy('name')->get();
+
+        return view('pages.profile', compact('user', 'cities'));
     }
 
     public function store(StoreUserRequest $request)
@@ -48,7 +53,8 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        if (Auth::user()->role !== 'Admin' && Auth::id() !== $user->id) {abort(403, 'Unauthorized');
+        if (Auth::user()->role !== 'Admin' && Auth::id() !== $user->id) {
+            abort(403, 'Unauthorized');
         }
         return new UserResource($user->load(['businessProfile', 'properties']));
     }

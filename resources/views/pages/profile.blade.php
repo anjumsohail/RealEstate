@@ -16,80 +16,88 @@
 
             <div class="row">
                 <!-- Start MainForm -->
-                <form id="usrPrfComp" class="form-horizontal" action="https://www.pins.pk/user/profile"
+                <form id="usrPrfComp" class="form-horizontal" action="{{ route('profile.update') }}"
                     enctype="multipart/form-data" data-fv-framework="bootstrap"
                     data-fv-icon-valid="fa fa-check-circle fa-2x" data-fv-icon-invalid="fa fa-times-circle fa-2x"
                     data-fv-icon-validating="fa fa-refresh fa-2x" method="post">
                     <div id="content" class="boxes">
+                        @csrf
+                        @method('PUT')
                         <div class="row">
                             <div class="col-lg-8">
                                 <div class="mid_title">Personal Details</div>
                                 <div class="form-horizontal">
-                                    <input type="hidden" name="file_path" id="file_path" value="0.jpg"
-                                        class="form-control">
-                                    <input type="hidden" name="logo_path" id="logo_path" value="logo.jpg"
-                                        class="form-control">
-                                    <input type="hidden" name="card_path" id="card_path" value="card.jpg"
-                                        class="form-control">
+
                                     <div class="control-group form-group">
                                         <div class="controls">
-                                            <label for="agentcat" class="col-lg-3 control-label">Register As:</label>
+                                            <label for="user_tye" class="col-lg-3 control-label">Register As:</label>
                                             <div class="col-lg-9 col-xs-10">
                                                 <label class="radio col-lg-6 col-xs-6 inline">
-                                                    <input type="radio" name="agentcat" id="postas1"
-                                                        onclick="ShowHideEstate(1);" value="Business" checked=""> <a
-                                                        data-toggle="tooltip" data-placement="bottom" data-html="true"
+                                                    <input type="radio" name="user_type" id="user_type" value="Business"
+                                                        {{ old('user_type', $user->user_type) === 'Business' ? 'checked' : '' }}>
+                                                    <a data-toggle="tooltip" data-placement="bottom" data-html="true"
                                                         title=""
-                                                        data-original-title="Register as &lt;b&gt;Business&lt;/b&gt; &lt;em&gt;Profile&lt;/em&gt;&lt;br/&gt; add your real estate business, advertise your services and grow your sales. Busines user will get an online &lt;b&gt;Property Showroom&lt;/b&gt;">
-                                                        Business <i class="fa fa-info-circle fa-1x "></i></a>
+                                                        data-original-title="Register as &lt;b&gt;Individua&lt;/b&gt; &lt;em&gt;Profile&lt;/em&gt;&lt;br/&gt; means you are single buyer or seller having no real estate business. Add your own propery for sale or buy!">
+                                                        Individual <i class="fa fa-info-circle fa-1x "></i></a>
+
                                                 </label>
 
                                                 <label class="radio col-lg-6 col-xs-6 inline">
-                                                    <input type="radio" name="agentcat" id="postast2"
-                                                        onclick="ShowHideEstate(2);" value="Individual"> <a
-                                                        data-toggle="tooltip" data-placement="bottom" data-html="true"
+                                                    <input type="radio" name="user_type" id="user_type" value="Individual"
+                                                        {{ old('user_type', $user->user_type) === 'Individual' ? 'checked' : '' }}>
+                                                    <a data-toggle="tooltip" data-placement="bottom" data-html="true"
                                                         title=""
                                                         data-original-title="Register as &lt;b&gt;Individua&lt;/b&gt; &lt;em&gt;Profile&lt;/em&gt;&lt;br/&gt; means you are single buyer or seller having no real estate business. Add your own propery for sale or buy!">
                                                         Individual <i class="fa fa-info-circle fa-1x "></i></a>
                                                 </label>
+                                                @error('user_type')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                         </div>
                                     </div>
                                     <div class="control-group form-group">
                                         <div class="controls">
-                                            <label for="user_email"
-                                                class="col-sm-3 control-label label-strong">Email:</label>
+                                            <label for="email" class="col-sm-3 control-label label-strong">Email:</label>
 
                                             <div class="col-sm-9">
-                                                <input type="email" class="form-control" disabled="" id="user_email"
-                                                    name="user_email" value="itdanjum@gmail.com">
+                                                <input type="email" class="form-control" id="email" name="email"
+                                                    value="{{ old('email', $user->email) }}">
                                             </div>
+                                            @error('email')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
 
                                     <div class="control-group form-group">
                                         <div class="controls">
-                                            <label for="user_name" class="col-sm-3 control-label label-strong">Your
+                                            <label for="name" class="col-sm-3 control-label label-strong">Your
                                                 Name:</label>
 
                                             <div class="col-sm-9">
-                                                <input type="text" class="form-control" id="user_name" name="user_name"
-                                                    maxlength="40" value="Anjum" data-fv-notempty="true"
-                                                    data-fv-notempty-message="Your complete name is required.">
+                                                <input type="text" class="form-control" id="name" name="name"
+                                                    value="{{ old('name', $user->name) }}">
                                             </div>
                                         </div>
+                                        @error('name')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                     <div class="control-group form-group">
                                         <div class="controls">
-                                            <label for="mobileno" class="col-sm-3 control-label label-strong">Mobile
+                                            <label for="mobile" class="col-sm-3 control-label label-strong">Mobile
                                                 #:</label>
 
-                                            <div class="col-sm-3">
-                                                <input type="text" name="mobileno" id="mobileno"
-                                                    placeholder="03001234567" required="" value="03212244779"
-                                                    class="form-control" data-fv-phone="true" data-fv-phone-country="PK"
+                                            <div class="col-sm-3">mobile
+                                                <input type="text" name="mobile" id="mobile"
+                                                    placeholder="03001234567" required=""
+                                                    value="{{ old('mobile', $user->mobile) }}" class="form-control"
+                                                    data-fv-phone="true" data-fv-phone-country="PK"
                                                     data-fv-phone-message="The value is not valid %s phone number">
-
+                                                @error('mobile')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
 
                                             </div>
                                             <label for="whatsapp" class="col-sm-3 control-label label-strong">Whatsapp
@@ -97,24 +105,30 @@
 
                                             <div class="col-sm-3">
                                                 <input type="text" name="whatsapp" id="whatsapp" required=""
-                                                    value="03212244779" class="form-control" data-fv-phone="true"
-                                                    data-fv-phone-country="PK"
+                                                    value="{{ old('whatsapp', $user->whatsapp) }}" class="form-control"
+                                                    data-fv-phone="true" data-fv-phone-country="PK"
                                                     data-fv-phone-message="The value is not valid %s phone number">
 
                                             </div>
+                                            @error('whatsapp')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
 
                                         </div>
                                     </div>
                                     <div class=" control-group form-group">
                                         <div class="controls">
-                                            <label for="agentphone" class="col-sm-3 control-label label-strong">Land Line
+                                            <label for="landline" class="col-sm-3 control-label label-strong">Land Line
                                                 #:</label>
                                             <div class="col-sm-3">
-                                                <input type="text" name="agentphone" id="agentphone"
-                                                    placeholder="02130000000" value="" class="form-control">
-
+                                                <input type="text" name="landline" id="landline"
+                                                    placeholder="02130000000"
+                                                    value="{{ old('landline', $user->landline) }}" class="form-control">
 
                                             </div>
+                                            @error('landline')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
 
                                         </div>
                                     </div>
@@ -161,25 +175,43 @@
                                             <label for="agenttype" class="col-lg-3 control-label">Nature of
                                                 Business:</label>
 
+                                            @php
+                                                $selectedServices = old(
+                                                    'services',
+                                                    $user->businessProfile->services ?? [],
+                                                );
+                                            @endphp
+
                                             <div class="col-lg-9 col-xs-10">
-                                                <div class="checkbox">
+                                                <div class="checkbox row">
                                                     <label class="col-lg-6 col-xs-6">
                                                         <input type="checkbox" name="services[]"
-                                                            value="Real Estate Agent">
+                                                            value="Real Estate Agent"
+                                                            {{ in_array('Real Estate Agent', $selectedServices) ? 'checked' : '' }}>
                                                         Real Estate Agent
                                                     </label>
+
                                                     <label class="col-lg-6 col-xs-6">
                                                         <input type="checkbox" name="services[]"
-                                                            value="Construction / Renovation"> Construction / Renovation
+                                                            value="Construction / Renovation"
+                                                            {{ in_array('Construction / Renovation', $selectedServices) ? 'checked' : '' }}>
+                                                        Construction / Renovation
                                                     </label>
+
                                                     <label class="col-lg-6 col-xs-6">
                                                         <input type="checkbox" name="services[]"
-                                                            value="Legal / Documentation"> Legal / Documentation
+                                                            value="Legal / Documentation"
+                                                            {{ in_array('Legal / Documentation', $selectedServices) ? 'checked' : '' }}>
+                                                        Legal / Documentation
                                                     </label>
+
                                                     <label class="col-lg-6 col-xs-6">
                                                         <input type="checkbox" name="services[]"
-                                                            value="Home Interior / Exterior"> Home Interior / Exterior
+                                                            value="Home Interior / Exterior"
+                                                            {{ in_array('Home Interior / Exterior', $selectedServices) ? 'checked' : '' }}>
+                                                        Home Interior / Exterior
                                                     </label>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -187,44 +219,37 @@
                                     <hr>
                                     <div class="control-group form-group">
                                         <div class="controls">
-                                            <label for="comp_name" class="col-sm-3 control-label label-strong">Company
+                                            <label for="company" class="col-sm-3 control-label label-strong">Company
                                                 Name:</label>
 
                                             <div class="col-sm-9">
-                                                <input type="text" class="form-control" id="comp_name"
-                                                    name="comp_name" maxlength="100" value="">
+                                                <input type="text" class="form-control" id="company" name="company"
+                                                    value="{{ old('company_name', $user->businessProfile->company_name) }}">
                                                 <p class="help-block"><small>For example, if your register as Estate Agent,
                                                         please enter your Real Estate Agency/Company Name</small></p>
                                             </div>
+                                            @error('company_name')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
 
                                         </div>
                                     </div>
+
                                     <div class="control-group form-group">
                                         <div class="controls">
-                                            <label for="urlid" class="col-sm-3 control-label label-strong">Profile
-                                                (URL):</label>
-
-                                            <div class="col-sm-9">
-                                                <input type="text" class="form-control" disabled="" id="urlid"
-                                                    name="urlid" maxlength="50" value="">
-                                                <p class="help-block">Youe Profile Link: <strong> </strong></p>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                    <div class="control-group form-group">
-                                        <div class="controls">
-                                            <label for="agentdesig" class="col-sm-3 control-label label-strong">Your
+                                            <label for="designation" class="col-sm-3 control-label label-strong">Your
                                                 Designation:</label>
 
                                             <div class="col-sm-9">
-                                                <input type="text" class="form-control" id="agentdesig"
-                                                    name="agentdesig" maxlength="30"
-                                                    placeholder="Property Consultant/Estate Agent etc"
-                                                    value="Property Consultant">
+                                                <input type="text" class="form-control" id="designation"
+                                                    name="designation" placeholder="Property Consultant/Estate Agent etc"
+                                                    value="{{ old('designation', $user->businessProfile->designation) }}">
                                                 <p class="help-block"><small>If your register as Agent, please enter your
                                                         Designation or Job Title</small></p>
                                             </div>
+                                            @error('designation')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
 
                                         </div>
                                     </div>
@@ -235,42 +260,37 @@
 
                                             <div class="col-sm-9">
                                                 <input type="text" name="address" id="address" maxlength="100"
-                                                    value="" class="form-control" data-fv-notempty="true"
+                                                    value="{{ old('address', $user->address) }}" class="form-control"
+                                                    data-fv-notempty="true"
                                                     data-fv-notempty-message="The complete address is required.">
                                             </div>
+                                            @error('address')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="control-group form-group">
                                         <div class="controls">
-                                            <label for="cityid"
+                                            <label for="city_id"
                                                 class="col-sm-3 control-label label-strong">City:</label>
 
                                             <div id="citydiv" class="col-sm-9">
-                                                <select name="cityid" id="cityid" class="form-control"
+                                                <select name="city_id" id="city_id" class="form-control"
                                                     data-fv-notempty="true"
                                                     data-fv-notempty-message="Please select the city.">
-                                                    <option value="14">Bahawalpur</option>
-                                                    <option value="5">Faisalabad</option>
-                                                    <option value="7">Gawadar</option>
-                                                    <option value="18">Gujranwala</option>
-                                                    <option value="10">Gujranwala</option>
-                                                    <option value="2">Hyderabad</option>
-                                                    <option value="8">Islamabad</option>
-                                                    <option value="19">Jhelum</option>
-                                                    <option value="1">Karachi</option>
-                                                    <option value="4">Lahore</option>
-                                                    <option value="6">Multan</option>
-                                                    <option value="15">Nawabshah</option>
-                                                    <option value="16">Nowshera</option>
-                                                    <option value="20">Peshawar</option>
-                                                    <option value="21">Quetta</option>
-                                                    <option value="22">Rahim Yar Khan</option>
-                                                    <option value="9">Rawalpindi</option>
-                                                    <option value="17">Sialkot</option>
-                                                    <option value="3">Sukker</option>
-                                                    <option value="11">Taxila</option>
-                                                    <option value="12">Wah Cantt</option>
+
+                                                    <option value="">-- Select City --</option>
+                                                    @foreach ($cities as $city)
+                                                        <option value="{{ $city->id }}"
+                                                            {{ old('city_id', $user->businessProfile->city_id) == $city->id ? 'selected' : '' }}>
+                                                            {{ $city->name }}
+                                                        </option>
+                                                    @endforeach
                                                 </select>
+
+                                                @error('city_id')
+                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                         </div>
                                     </div>
@@ -279,15 +299,23 @@
                                             <label for="latitude" class="col-lg-3 control-label">Google Latitude:</label>
                                             <div class="col-lg-3">
                                                 <input type="text" class="form-control" id="latitude"
-                                                    name="latitude" value="24.860700" placeholder="i.e 24.101010"
-                                                    maxlength="10">
+                                                    name="latitude"
+                                                    value="{{ old('latitude', $user->businessProfile->latitude) }}"
+                                                    placeholder="i.e 24.101010">
+                                                @error('latitude')
+                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                             <label for="longitude" class="col-lg-3 control-label">Google
                                                 Longitude:</label>
                                             <div class="col-lg-3">
                                                 <input type="text" class="form-control" id="longitude"
-                                                    name="longitude" value="67.001100" placeholder="i.e 67.101010"
-                                                    maxlength="10">
+                                                    name="longitude"
+                                                    value="{{ old('longitude', $user->businessProfile->longitude) }}"
+                                                    placeholder="i.e 67.101010" maxlength="10">
+                                                @error('longitude')
+                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                         </div>
                                     </div>
@@ -297,8 +325,13 @@
                                                 Estate
                                                 Description:</label>
                                             <div class="col-sm-9">
-                                                <textarea class="form-control" rows="5" id="agentdesc" name="agentdesc"
-                                                    placeholder="Describe your estate profile in detail"></textarea>
+                                                <textarea class="form-control" rows="5" id="company_description" name="company_description"
+                                                    placeholder="Describe your estate profile in detail">
+                                                {{ old('company_description', $user->businessProfile->company_description) }}
+                                                </textarea>
+                                                @error('company_description')
+                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                         </div>
                                     </div>

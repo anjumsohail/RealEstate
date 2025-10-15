@@ -39,7 +39,8 @@
                             <div class="boxes clearfix">
                                 <!-- Service Information Column -->
                                 <h3 class="title"><i class="fa fa-fw fa-user"></i> <b>Personal Information</b> <span
-                                        class="pull-right">Register as : <b>Business</b> </span></h3>
+                                        class="pull-right">Register as : <b>{{ $user->user_type ?: 'Guest' }}</b> </span>
+                                </h3>
                                 <div class="control-group form-group">
                                     <div class="controls text-center">
 
@@ -62,7 +63,7 @@
                                                 <p class="pull-right"><strong>Profile ID:</strong></p>
                                             </div>
                                             <div class="col-sm-4 col-xs-2">
-                                                <p class="text-info">1600</p>
+                                                <p class="text-info">{{ $user->id ?: '' }}</p>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -70,13 +71,13 @@
                                                 <p class="pull-right"><strong>Email:</strong></p>
                                             </div>
                                             <div class="col-sm-4 col-xs-9">
-                                                <p class="text-info">itdanjum@gmail.com</p>
+                                                <p class="text-info">{{ $user->email ?: 'Guest' }}</p>
                                             </div>
                                             <div class="col-sm-2 col-xs-3">
                                                 <p class="pull-right"><strong>Created:</strong></p>
                                             </div>
                                             <div class="col-sm-4 col-xs-9">
-                                                <p class="text-info">2024-06-27 10:41:04</p>
+                                                <p class="text-info">{{ $user->created_date ?: now()->format('Y-m-d') }}</p>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -84,7 +85,7 @@
                                                 <p class="pull-right"><strong>Address:</strong></p>
                                             </div>
                                             <div class="col-sm-10 col-xs-9">
-                                                <p class="text-info"> </p>
+                                                <p class="text-info"> {{ $user->address ?: 'N/A' }}</p>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -92,19 +93,19 @@
                                                 <p class="pull-right"><strong>Mobile No.:</strong></p>
                                             </div>
                                             <div class="col-sm-2 col-xs-3">
-                                                <p class="text-info">03212244779</p>
+                                                <p class="text-info">{{ $user->mobile ?: 'N/A' }}</p>
                                             </div>
                                             <div class="col-sm-2 col-xs-3">
                                                 <p class="pull-right"><strong>Whatsapp:</strong></p>
                                             </div>
                                             <div class="col-sm-2 col-xs-3">
-                                                <p class="text-info">03212244779</p>
+                                                <p class="text-info">{{ $user->whatsapp ?: 'N/A' }}</p>
                                             </div>
                                             <div class="col-sm-2 col-xs-3">
                                                 <p class="pull-right"><strong>Landline:</strong></p>
                                             </div>
                                             <div class="col-sm-2 col-xs-3">
-                                                <p class="text-info"></p>
+                                                <p class="text-info">{{ $user->landline ?: 'N/A' }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -112,7 +113,8 @@
                                         <div class="text-center">
                                             <div class="img-responsive">
                                                 <img class="img-rounded img-thumbnail w-50"
-                                                    src="{{ $user->profile_photo_url }}" alt="User profile photo">
+                                                    src="{{ asset('storage/' . $user->profile_photo_path) }}"
+                                                    alt="User profile photo">
                                             </div>
                                         </div>
                                     </div>
@@ -127,7 +129,7 @@
                                             <p class="pull-right"><strong>Facebook URL:</strong></p>
                                         </div>
                                         <div class="col-sm-4 col-xs-8">
-                                            <p class="text-info"></p>
+                                            <p class="text-info">{{ $user->facebook_url ?: 'N/A' }}</p>
                                         </div>
                                         <div class="col-sm-2 col-xs-4">
                                             <p class="pull-right"><strong>Twitter URL:</strong></p>
@@ -141,7 +143,7 @@
                                             <p class="pull-right"><strong>LinkedIn URL:</strong></p>
                                         </div>
                                         <div class="col-sm-4 col-xs-8">
-                                            <p class="text-info"></p>
+                                            <p class="text-info">{{ $user->linkedin_url ?: 'N/A' }}</p>
                                         </div>
                                         <div class="col-sm-2 col-xs-4">
                                             <p class="pull-right"><strong>Google+ URL:</strong></p>
@@ -161,18 +163,19 @@
                                                 <p class="pull-right"><strong>Company Name:</strong></p>
                                             </div>
                                             <div class="col-sm-9 col-xs-7">
-                                                <p class="text-info"><strong></strong></p>
+                                                <p class="text-info"><strong>{{ $user->company_name ?: 'N/A' }}</strong>
+                                                </p>
                                             </div>
                                         </div>
                                         <div class="control-group form-group">
-                                            <div class="controls">
-                                                <label for="agenttype" class="col-lg-3 control-label">Nature of
-                                                    Business:</label>
-                                                <div class="col-sm-9 col-xs-12">
-                                                    <div class="post-tags-list">
-                                                        <a href="javascript:void(0)"><input type="checkbox"
-                                                                name="agree" checked="" disabled=""> </a>
-                                                    </div>
+                                            <div class="row">
+                                                <div class="col-sm-3 col-xs-5">
+                                                    <p class="pull-right"><strong>Nature of Business:</strong></p>
+                                                </div>
+                                                <div class="col-sm-9 col-xs-7">
+                                                    <p class="text-info">
+                                                        <strong>{{ $user->business_nature ?: 'N/A' }}</strong>
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -181,7 +184,7 @@
                                                 <p class="pull-right"><strong>Your Title:</strong></p>
                                             </div>
                                             <div class="col-sm-9 col-xs-9">
-                                                <p class="text-info">Property Consultant</p>
+                                                <p class="text-info">{{ $user->designation ?: 'N/A' }}</p>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -189,8 +192,7 @@
                                                 <p class="pull-right"><strong>Profile URL:</strong></p>
                                             </div>
                                             <div class="col-sm-9 col-xs-9">
-                                                <p class="text-info"><a
-                                                        href="https://www.pins.pk/">https://www.pins.pk/</a></p>
+                                                <p class="text-info"><a></a></p>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -198,7 +200,7 @@
                                                 <p class="pull-right"><strong>Description:</strong></p>
                                             </div>
                                             <div class="col-sm-9 col-xs-9">
-                                                <p class="text-info"></p>
+                                                <p class="text-info">{{ $user->company_description ?: 'N/A' }}</p>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -206,35 +208,14 @@
                                                 <p class="pull-right"><strong>Services Offered:</strong></p>
                                             </div>
                                             <div class="col-sm-9 col-xs-9">
-                                                <p class="text-info"></p>
+                                                <p class="text-info">{{ $user->services ?: 'N/A' }}</p>
                                             </div>
                                         </div>
 
 
                                     </div>
                                     <hr>
-                                    <div class="col-lg-4">
-                                        <div class="text-center">
-                                            <h5 class="form-title"><i class="fa fa-fw fa-file-image-o"></i> <b>Company
-                                                    Logo</b></h5>
-                                            <div class="form-group">
-                                                <div class="img-responsive">
-                                                    <img class="img-thumbnail"
-                                                        src="https://www.pins.pk/uploads/agent/logo.jpg" alt="?&gt;">
-                                                </div>
-                                            </div>
-                                            <hr>
-                                            <h5 class="form-title"><i class="fa fa-fw fa-file-image-o"></i>Visiting Card
-                                            </h5>
-                                            <div class="form-group">
-                                                <div class="img-responsive">
-                                                    <img class="img-thumbnail"
-                                                        src="https://www.pins.pk/uploads/agent/card.jpg"
-                                                        style="width: 300px; height: 180px" alt="?&gt;">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+
                                 </div>
                                 <div class="hr5 margin-10"></div>
                                 <div class="col-lg-12">

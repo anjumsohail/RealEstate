@@ -31,9 +31,27 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-        protected $fillable = [
-        'user_type', 'name', 'email', 'mobile', 'password',
-        'address', 'profile_photo', 'landline', 'whatsapp'
+    protected $fillable = [
+        'user_type',
+        'name',
+        'email',
+        'mobile',
+        'password',
+        'address',
+        'profile_photo',
+        'landline',
+        'whatsapp',
+        'business_nature',
+        'company_name',
+        'company_description',
+        'designation',
+        'city',
+        'services',
+        'facebook_url',
+        'youtube_url',
+        'linkedin_url',
+        'latitude',
+        'longitude',
     ];
 
     protected $hidden = [
@@ -62,14 +80,16 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+
         ];
     }
-        public function businessProfile() {
+    public function businessProfile()
+    {
         return $this->hasOne(BusinessUser::class);
     }
 
-    public function properties() {
+    public function properties()
+    {
         return $this->hasMany(PropertyAdvertisement::class);
     }
-    
 }
