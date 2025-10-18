@@ -46,7 +46,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/user/view', [UserController::class, 'index'])->name('profile.view');
     Route::get('/user/properties', [UserController::class, 'UserProperties'])->name('property.myproperties');
     Route::get('/user/edit', [UserController::class, 'edit'])->name('profile.edit');
-    Route::put('/user/update', [UserController::class, 'update'])->name('profile.update');
+    Route::patch('/user/{user}/update', [UserController::class, 'update'])->name('profile.update');
+
+
+
 
     Route::get('/property/add', [PropertyAdvertisementController::class, 'add'])->name('property.add');
     Route::get('/property/MapSearch', [PropertyAdvertisementController::class, 'MapSearch'])->name('property.MapSearch');

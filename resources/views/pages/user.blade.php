@@ -129,7 +129,7 @@
                                             <p class="pull-right"><strong>Facebook URL:</strong></p>
                                         </div>
                                         <div class="col-sm-4 col-xs-8">
-                                            <p class="text-info">{{ $user->facebook_url ?: 'N/A' }}</p>
+                                            <p class="text-info">{{ $user->businessProfile->facebook_url ?: 'N/A' }}</p>
                                         </div>
                                         <div class="col-sm-2 col-xs-4">
                                             <p class="pull-right"><strong>Twitter URL:</strong></p>
@@ -143,13 +143,13 @@
                                             <p class="pull-right"><strong>LinkedIn URL:</strong></p>
                                         </div>
                                         <div class="col-sm-4 col-xs-8">
-                                            <p class="text-info">{{ $user->linkedin_url ?: 'N/A' }}</p>
+                                            <p class="text-info">{{ $user->businessProfile->linkedin_url ?: 'N/A' }}</p>
                                         </div>
                                         <div class="col-sm-2 col-xs-4">
                                             <p class="pull-right"><strong>Google+ URL:</strong></p>
                                         </div>
                                         <div class="col-sm-4 col-xs-8">
-                                            <p class="text-info"></p>
+                                            <p class="text-info">{{ $user->businessProfile->youtube_url ?: 'N/A' }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -163,7 +163,8 @@
                                                 <p class="pull-right"><strong>Company Name:</strong></p>
                                             </div>
                                             <div class="col-sm-9 col-xs-7">
-                                                <p class="text-info"><strong>{{ $user->company_name ?: 'N/A' }}</strong>
+                                                <p class="text-info">
+                                                    <strong>{{ $user->businessProfile->company_name ?: 'N/A' }}</strong>
                                                 </p>
                                             </div>
                                         </div>
@@ -174,7 +175,10 @@
                                                 </div>
                                                 <div class="col-sm-9 col-xs-7">
                                                     <p class="text-info">
-                                                        <strong>{{ $user->business_nature ?: 'N/A' }}</strong>
+                                                        <strong>{{ is_array($user->businessProfile->business_nature)
+                                                            ? implode(', ', $user->businessProfile->business_nature)
+                                                            : ($user->businessProfile->business_nature ?:
+                                                                'N/A') }}</strong>
                                                     </p>
                                                 </div>
                                             </div>
@@ -184,7 +188,8 @@
                                                 <p class="pull-right"><strong>Your Title:</strong></p>
                                             </div>
                                             <div class="col-sm-9 col-xs-9">
-                                                <p class="text-info">{{ $user->designation ?: 'N/A' }}</p>
+                                                <p class="text-info">{{ $user->businessProfile->designation ?: 'N/A' }}
+                                                </p>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -200,7 +205,8 @@
                                                 <p class="pull-right"><strong>Description:</strong></p>
                                             </div>
                                             <div class="col-sm-9 col-xs-9">
-                                                <p class="text-info">{{ $user->company_description ?: 'N/A' }}</p>
+                                                <p class="text-info">
+                                                    {{ $user->businessProfile->company_description ?: 'N/A' }}</p>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -208,13 +214,56 @@
                                                 <p class="pull-right"><strong>Services Offered:</strong></p>
                                             </div>
                                             <div class="col-sm-9 col-xs-9">
-                                                <p class="text-info">{{ $user->services ?: 'N/A' }}</p>
+                                                <strong>{{ is_array($user->businessProfile->services)
+                                                    ? implode(', ', $user->businessProfile->services)
+                                                    : ($user->businessProfile->services ?:
+                                                        'N/A') }}</strong>
                                             </div>
                                         </div>
 
 
                                     </div>
                                     <hr>
+                                    @php
+                                        $logoPath = $user->businessProfile->logo ?? null;
+                                        $logoFullPath = $logoPath ? public_path('storage/' . $logoPath) : null;
+                                        $LogoUrl =
+                                            $logoFullPath && file_exists($logoFullPath)
+                                                ? asset('storage/' . $logoPath)
+                                                : asset('storage/profile-photos/NoImage.jpg');
+                                    @endphp
+                                    <div class="col-lg-4">
+                                        <div class="text-center">
+                                            <h5 class="form-title"><i class="fa fa-fw fa-file-image-o"></i> <b>Company
+                                                    Logo</b></h5>
+                                            <div class="form-group">
+                                                <div class="img-responsive">
+                                                    <img class="img-rounded img-thumbnail w-50" src="{{ $LogoUrl }}"
+                                                        alt="Logo">
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <h5 class="form-title"><i class="fa fa-fw fa-file-image-o"></i>Visiting Card
+                                            </h5>
+                                            @php
+                                                $vcardPath = $user->businessProfile->vcard ?? null;
+                                                $vcardFullPath = $vcardPath
+                                                    ? public_path('storage/' . $vcardPath)
+                                                    : null;
+                                                $vcardUrl =
+                                                    $vcardFullPath && file_exists($vcardFullPath)
+                                                        ? asset('storage/' . $vcardPath)
+                                                        : asset('storage/profile-photos/NoImage.jpg');
+                                            @endphp
+                                            <div class="form-group">
+                                                <div class="img-responsive">
+
+                                                    <img class="img-rounded img-thumbnail w-50" src="{{ $vcardUrl }}"
+                                                        style="width: 300px; height: 180px" alt="Card">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                 </div>
                                 <div class="hr5 margin-10"></div>

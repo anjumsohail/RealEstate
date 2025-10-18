@@ -43,7 +43,7 @@
                         <a href="contact.html" class="nav-item nav-link">Contact</a>
                     </div>
                     @auth
-                        <a href="{{ route('property.add') }}" class="btn btn-primary px-3 d-none d-lg-flex">Add Property</a>
+                        <a href="{{ route('property.add') }}" class="btn btn-primary px-3 d-lg-flex">Add Property</a>
                     @endauth
                     <ul class="nav navbar-nav navbar-right">
                         <li class="dropdown">

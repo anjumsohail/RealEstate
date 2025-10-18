@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -38,20 +39,10 @@ class User extends Authenticatable
         'mobile',
         'password',
         'address',
-        'profile_photo',
+        'profile_photo_path',
         'landline',
         'whatsapp',
-        'business_nature',
-        'company_name',
-        'company_description',
-        'designation',
-        'city',
-        'services',
-        'facebook_url',
-        'youtube_url',
-        'linkedin_url',
-        'latitude',
-        'longitude',
+
     ];
 
     protected $hidden = [
@@ -91,5 +82,13 @@ class User extends Authenticatable
     public function properties()
     {
         return $this->hasMany(PropertyAdvertisement::class);
+    }
+
+    public function deleteProfilePhoto()
+    {
+        if ($this->profile_photo) {
+            Storage::disk('public')->delete($this->profile_photo);
+            $this->update(['profile_photos' => null]);
+        }
     }
 }

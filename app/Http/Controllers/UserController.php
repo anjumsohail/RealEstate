@@ -6,11 +6,15 @@ use App\Models\User;
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use App\Services\UserCreateService;
+use Illuminate\Support\Facades\Log;
+use Exception;
 
 class UserController extends Controller
 {
@@ -23,6 +27,7 @@ class UserController extends Controller
         if (Auth::user()->role !== 'Admin') {
             $user = User::with(['businessProfile', 'properties'])->findOrFail(Auth::id());
         }
+        //dd($user->businessProfile);
         return view('pages.user', compact('user'));
     }
 
@@ -42,12 +47,41 @@ class UserController extends Controller
         return view('pages.profile', compact('user', 'cities'));
     }
 
-    public function store(StoreUserRequest $request)
+    public function store(StoreUserRequest $request, UserCreateService $userService)
     {
-        $data = $request->validated();
-        $data['password'] = Hash::make($data['password']);
-        $user = User::create($data);
-        return new UserResource($user->load(['businessProfile', 'properties']));
+        try {
+            // Authorization: only Admins can create users
+            if (Auth::user()->role !== 'Admin') {
+                abort(403, 'Unauthorized');
+            }
+
+            // Extract validated arrays
+            $userData = $request->validated('user');
+            $profileData = $request->validated('profile');
+
+            // Attach file objects if present
+            if ($request->hasFile('user.profile_photo')) {
+                $userData['profile_photo_file'] = $request->file('user.profile_photo');
+            }
+
+            if ($request->hasFile('profile.logo')) {
+                $profileData['logo_file'] = $request->file('profile.logo');
+            }
+
+            if ($request->hasFile('profile.vcard')) {
+                $profileData['vcard_file'] = $request->file('profile.vcard');
+            }
+
+            // Call the service to create both
+            $user = $userService->createUserWithProfile($userData, $profileData);
+
+            return redirect()->route('users.index')->with('success', 'User created successfully.');
+        } catch (Exception $e) {
+            \Log::error('User creation failed: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return redirect()->back()->with('error', 'Failed to create user. Please try again.');
+        }
     }
 
 
@@ -59,18 +93,36 @@ class UserController extends Controller
         return new UserResource($user->load(['businessProfile', 'properties']));
     }
 
-    public function update(StoreUserRequest $request, User $user)
+    public function update(StoreUserRequest $request, User $user, UserCreateService $userService)
     {
         if (Auth::user()->role !== 'Admin' && Auth::id() !== $user->id) {
             abort(403, 'Unauthorized');
         }
-        $data = $request->validated();
-        if (isset($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
+
+        $userData = $request->validated('user');
+        $profileData = $request->validated('profile');
+
+
+
+        // Attach files for service to handle
+        if ($request->hasFile('user.profile_photo_path')) {
+            $userData['profile_photo_path'] = $request->file('user.profile_photo_path');
         }
-        $user->update($data);
-        return new UserResource($user->load(['businessProfile', 'properties']));
+
+        if ($request->hasFile('profile.logo')) {
+            $profileData['logo_file'] = $request->file('profile.logo');
+        }
+
+        if ($request->hasFile('profile.vcard')) {
+            $profileData['vcard_file'] = $request->file('profile.vcard');
+        }
+
+        // Delegate full logic to service
+        $userService->updateUserWithProfile($user, $userData, $profileData);
+
+        return redirect()->back()->with('success', 'Profile updated successfully.');
     }
+
 
     public function destroy(User $user)
     {

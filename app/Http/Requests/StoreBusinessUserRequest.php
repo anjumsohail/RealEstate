@@ -22,17 +22,22 @@ class StoreBusinessUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'business_nature' => 'required|in:Agent,Construction,Legal,Designer',
+            'business_nature' => 'required',
             'company_name' => 'required|string|max:255',
             'company_description' => 'nullable|string',
             'designation' => 'nullable|string|max:255',
-            'city' => 'required|string|max:100',
-            'services' => 'nullable|string',
+            'city_id' => 'required',
+            'services' => 'nullable',
             'facebook_url' => 'nullable|url',
             'youtube_url' => 'nullable|url',
             'linkedin_url' => 'nullable|url',
             'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180'
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'vcard'=> 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+             'logo'=> 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+
+
+
         ];
     }
 }

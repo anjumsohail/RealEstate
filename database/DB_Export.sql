@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.2
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 05, 2025 at 01:51 PM
+-- Generation Time: Oct 18, 2025 at 10:22 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -1760,20 +1760,29 @@ INSERT INTO `blocks` (`id`, `name`, `osm_relation_id`, `geometry`, `sector_id`, 
 CREATE TABLE `business_users` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `user_id` bigint(20) UNSIGNED NOT NULL,
-  `business_nature` enum('Agent','Construction','Legal','Designer') NOT NULL,
+  `business_nature` varchar(250) NOT NULL,
   `company_name` varchar(255) NOT NULL,
   `company_description` text DEFAULT NULL,
   `designation` varchar(255) DEFAULT NULL,
-  `city` varchar(255) NOT NULL,
+  `city_id` bigint(20) NOT NULL,
   `services` varchar(255) DEFAULT NULL,
   `facebook_url` varchar(255) DEFAULT NULL,
   `youtube_url` varchar(255) DEFAULT NULL,
   `linkedin_url` varchar(255) DEFAULT NULL,
   `latitude` decimal(10,7) DEFAULT NULL,
   `longitude` decimal(10,7) DEFAULT NULL,
+  `logo` varchar(255) NOT NULL,
+  `vcard` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `business_users`
+--
+
+INSERT INTO `business_users` (`id`, `user_id`, `business_nature`, `company_name`, `company_description`, `designation`, `city_id`, `services`, `facebook_url`, `youtube_url`, `linkedin_url`, `latitude`, `longitude`, `logo`, `vcard`, `created_at`, `updated_at`) VALUES
+(1, 1, '[\"Real Estate Agent\",\"Home Interior \\/ Exterior\"]', 'Anjumnet', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.', 'Sr. Tech Officer', 1, '[\"Sales Purchase\",\"Property Rental\",\"Real Estate Marketing\",\"Interior Designer\"]', 'https://www.facebook.com/anjumsohail', 'https://www.youtube.com/anjumsohail', 'https://www.linkedin.com/anjumsohail', 24.9437482, 67.1662045, 'profile-photos/3A0OeoFa3zb0AxyJyw0ZwXVxKdqeEoeMbRip18Xn.png', 'profile-photos/O2dCri89JOkWtCflxBoZdvp5IunOJ6IQUuXOc2px.png', '2025-10-15 22:57:34', '2025-10-18 03:10:31');
 
 -- --------------------------------------------------------
 
@@ -1992,6 +2001,7 @@ CREATE TABLE `property_advertisements` (
   `purpose` enum('Sale','Rent') NOT NULL,
   `category` enum('Residential','Commercial') NOT NULL,
   `proptype` enum('Plot','Home','Apartment','Portion','Cottage') NOT NULL,
+  `featured` tinyint(1) NOT NULL DEFAULT 0,
   `title` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
   `address` varchar(255) DEFAULT NULL,
@@ -2004,6 +2014,7 @@ CREATE TABLE `property_advertisements` (
   `back_site` varchar(255) DEFAULT NULL,
   `demand_price` decimal(15,2) NOT NULL,
   `pricetype` varchar(255) DEFAULT NULL,
+  `housetype` varchar(255) NOT NULL,
   `floor` varchar(255) DEFAULT NULL,
   `bedrooms` varchar(255) DEFAULT NULL,
   `consage` varchar(255) DEFAULT NULL,
@@ -2019,10 +2030,13 @@ CREATE TABLE `property_advertisements` (
 -- Dumping data for table `property_advertisements`
 --
 
-INSERT INTO `property_advertisements` (`id`, `city_id`, `town_id`, `sector_id`, `block_id`, `purpose`, `category`, `proptype`, `title`, `description`, `address`, `latitude`, `longitude`, `area_size`, `size_unit`, `positioning`, `front_face`, `back_site`, `demand_price`, `pricetype`, `floor`, `bedrooms`, `consage`, `conscond`, `postas`, `social`, `user_id`, `created_at`, `updated_at`) VALUES
-(53, 1, 13, 445, 870, 'Sale', 'Residential', 'Plot', 'Golden Urban house for Sell', 'Best Location', 'Main University Road Safoora', 24.9429278, 67.1591958, 240.00, 'Sqf', 'East Open', 'Main Road', 'Playgound', 12000.00, 'Total Price', NULL, '3', NULL, NULL, 'Individual', 'Y', 1, '2025-10-02 00:00:36', '2025-10-02 00:00:36'),
-(54, 1, 13, 17, 143, 'Rent', 'Residential', 'Plot', 'Golden Urban house for Rent', 'Good Location', 'Near Safoora', 24.9417890, 67.1628307, 250.00, 'Sqy', 'North Open', 'Apartment', 'Park', 18000.00, 'Own Price', NULL, '4', NULL, NULL, 'Individual', 'Y', 1, '2025-10-02 00:02:43', '2025-10-02 00:02:43'),
-(55, 1, 13, 17, NULL, 'Sale', 'Residential', 'Plot', 'test', 'sdfasdf', 'asdfasdf', 24.9664487, 67.1724430, 240.00, 'Sqy', 'East Open', 'Commercial', 'Compound', 12000.00, 'Booking Price', NULL, NULL, NULL, NULL, 'Individual', 'Y', 1, '2025-10-05 06:50:19', '2025-10-05 06:50:19');
+INSERT INTO `property_advertisements` (`id`, `city_id`, `town_id`, `sector_id`, `block_id`, `purpose`, `category`, `proptype`, `featured`, `title`, `description`, `address`, `latitude`, `longitude`, `area_size`, `size_unit`, `positioning`, `front_face`, `back_site`, `demand_price`, `pricetype`, `housetype`, `floor`, `bedrooms`, `consage`, `conscond`, `postas`, `social`, `user_id`, `created_at`, `updated_at`) VALUES
+(53, 1, 13, 445, 870, 'Sale', 'Residential', 'Plot', 1, 'Golden Urban house for Sell', 'Best Location', 'Main University Road Safoora', 24.9429278, 67.1591958, 240.00, 'Sqf', 'East Open', 'Main Road', 'Playgound', 12000.00, 'Total Price', 'Single', NULL, '3', NULL, NULL, 'Individual', 'Y', 1, '2025-10-01 19:00:36', '2025-10-01 19:00:36'),
+(54, 1, 13, 17, 143, 'Rent', 'Residential', 'Plot', 0, 'Golden Urban house for Rent', 'Good Location', 'Near Safoora', 24.9417890, 67.1628307, 250.00, 'Sqy', 'North Open', 'Apartment', 'Park', 18000.00, 'Own Price', 'Single', NULL, '4', NULL, NULL, 'Individual', 'Y', 1, '2025-10-01 19:02:43', '2025-10-01 19:02:43'),
+(55, 1, 3, 28, NULL, 'Rent', 'Residential', 'Home', 0, '120 Sqft Luxary Home', 'Best Location, Gated Community', 'Gulistan e Johar Blk 7, Safoora', 24.9392926, 67.1624279, 120.00, 'Sqf', 'East Open', 'Main Road', 'Mosque', 12000.00, 'Total Price', 'Single', NULL, '3', 'New', 'Normal', 'Individual', 'Y', 1, '2025-10-07 18:15:58', '2025-10-07 18:15:58'),
+(56, 1, 2, NULL, NULL, 'Sale', 'Residential', 'Cottage', 1, '150 Yards Cottage, Part  view', 'Road Facing, Good Location', 'Blk-7, Safoora, Gulzar Hijri', 24.9437482, 67.1487164, 150.00, 'Sqy', 'East Open', 'Mosque', 'Jinnah Avenue', 200000.00, 'Own Price', 'Single', '2nd', '4', 'New', 'Demolish', 'Individual', 'Y', 1, '2025-10-07 18:20:32', '2025-10-07 18:20:32'),
+(57, 1, 3, 28, 168, 'Rent', 'Residential', 'Apartment', 0, '240 Sqft Prime Location', 'Best Value for Money', 'Sunlay Apartments Safoora', 24.9445848, 67.1662045, 240.00, 'Sqf', 'West Open', 'Homes', 'Compound', 25000.00, 'Booking Price', 'Single', '2nd', '3', 'New', 'Renovated', 'Individual', 'Y', 1, '2025-10-07 18:22:43', '2025-10-07 18:22:43'),
+(58, 1, 2, NULL, NULL, 'Sale', 'Residential', 'Home', 0, '80 Yards Home', 'New Location, Park Facing', 'Saima Presidency', 24.9414718, 67.1569347, 80.00, 'Sqy', 'North Open', 'Park', 'Park', 9800.00, 'Own Price', 'Single', NULL, '2', 'New', 'Demolish', 'Individual', 'Y', 1, '2025-10-07 18:24:23', '2025-10-07 18:24:23');
 
 -- --------------------------------------------------------
 
@@ -2044,11 +2058,20 @@ CREATE TABLE `property_pictures` (
 --
 
 INSERT INTO `property_pictures` (`id`, `property_advertisement_id`, `title`, `image_path`, `created_at`, `updated_at`) VALUES
-(26, 53, 'Main Entry', 'property_images/YAEGMhjMavfhUKM9UWehBPRTP20yhaIYHg55lqWI.jpg', '2025-10-02 00:00:37', '2025-10-02 00:00:37'),
-(27, 54, 'Pool Side', 'property_images/OXVw3nvIOP5UFIjYv7cnur0psWbo1LWhA9mGOeiB.jpg', '2025-10-02 00:02:43', '2025-10-02 00:02:43'),
-(28, 55, 'Main Side', 'property_images/d3vhL1b5BTiJRoOVOfQA1Sh1EavRptOUiv6WVR7c.jpg', '2025-10-05 06:50:19', '2025-10-05 06:50:19'),
-(29, 55, 'Front Side', 'property_images/OayvEIGdhoM29jOWz0tgE5C4C08p5EajzeebzneG.jpg', '2025-10-05 06:50:19', '2025-10-05 06:50:19'),
-(30, 55, 'Pool Side', 'property_images/GAGQwR1O5pKx3uWoKEV5qDwCIFwHscpNYZ7QrDn5.jpg', '2025-10-05 06:50:19', '2025-10-05 06:50:19');
+(26, 53, 'Main Entry', 'property_images/YAEGMhjMavfhUKM9UWehBPRTP20yhaIYHg55lqWI.jpg', '2025-10-01 19:00:37', '2025-10-01 19:00:37'),
+(27, 54, 'Pool Side', 'property_images/OXVw3nvIOP5UFIjYv7cnur0psWbo1LWhA9mGOeiB.jpg', '2025-10-01 19:02:43', '2025-10-01 19:02:43'),
+(28, 55, 'Enterance', 'property_images/1zKXMkfRt56VsFYRuMBGPyNyIJuxjrzV2WOnrtT8.png', '2025-10-07 18:15:59', '2025-10-07 18:15:59'),
+(29, 55, 'Side view', 'property_images/rbB04wQdZB2OdhLqpxBFudo7yPhpkuG9MUKqftWK.png', '2025-10-07 18:15:59', '2025-10-07 18:15:59'),
+(30, 55, 'Dining Room', 'property_images/6D8eCkckqDVUxMPobHzFWcVZt96Ma5XXv9RhXi4X.png', '2025-10-07 18:15:59', '2025-10-07 18:15:59'),
+(31, 55, 'Kitchen', 'property_images/rm30SdImyTOViq1A3yUfwIyaufZx7v78JH3FzKLM.png', '2025-10-07 18:16:00', '2025-10-07 18:16:00'),
+(32, 56, 'Front view', 'property_images/KLRJLfg8qQj5tE8rqahohdLY4rBsv6fyR9nacvok.png', '2025-10-07 18:20:32', '2025-10-07 18:20:32'),
+(33, 56, 'Kitchen', 'property_images/FqgVTxVHf0iS7Gzv7aMqPtL47qKAzHFQBhtc01PS.png', '2025-10-07 18:20:32', '2025-10-07 18:20:32'),
+(34, 56, 'Washroom', 'property_images/vc9M5JrjkDHOn6X2hNFXAiF92eA2m6ebooXVPe51.png', '2025-10-07 18:20:33', '2025-10-07 18:20:33'),
+(35, 57, 'Entry Gate', 'property_images/cFaQcGhZ2xRdPmN5Yz2NX1mdxn8yZyJgjJhLGJNg.png', '2025-10-07 18:22:44', '2025-10-07 18:22:44'),
+(36, 57, 'Kitchen', 'property_images/N7K3dYTJBDEZ0ZDUow6Jt203rbqWvfpRtVUGVLCn.png', '2025-10-07 18:22:44', '2025-10-07 18:22:44'),
+(37, 57, 'Bedroom', 'property_images/Gth83iqmy6C5dSNVM2npUT0T99CohjG8TBDlheso.png', '2025-10-07 18:22:44', '2025-10-07 18:22:44'),
+(38, 57, 'BathRoom', 'property_images/qB3T80YWmExpRsdHm0qerDMnJRB3fGGGg03fakvq.png', '2025-10-07 18:22:45', '2025-10-07 18:22:45'),
+(39, 58, 'Front View', 'property_images/qEo4fqvQGWRvjpFbzPxHiqBEpaqwkigTP3JLkoDj.png', '2025-10-07 18:24:24', '2025-10-07 18:24:24');
 
 -- --------------------------------------------------------
 
@@ -2783,7 +2806,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('uSsw7DRSLuljqGXmdgRHmJnDzLomjWh1E9dmHJPp', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiMXh3SlhRRGlhVmE1RVU5U3ZjSFNLVGd6MHNZdEdRWFdZbE5YV1o5SiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9kYXNoYm9hcmQiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO3M6MjE6InBhc3N3b3JkX2hhc2hfc2FuY3R1bSI7czo2MDoiJDJ5JDEyJHMzeUVnUWxoTERHdDA0V0NUOUViYnVUazBnbXJuY3RockZHZEZlclVLWjhOcG93MnZBUnJtIjt9', 1759665019);
+('nyMUcX2NSMcESVj5altbbD5ioQvaVX1qTaZc9hE0', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'YTo2OntzOjY6Il90b2tlbiI7czo0MDoiV3l6N1kyZ3pnUkZ1RDJCSkJWS1UwV3QwSm5vaHpETEt6eTZQZ0FrVCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9kYXNoYm9hcmQiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO3M6MjE6InBhc3N3b3JkX2hhc2hfc2FuY3R1bSI7czo2MDoiJDJ5JDEyJHAzZ0FtVzhSLmtGeDFZMkwxWUJJVHVpZ0oxZDZhUEtrM3I3WGJNZDRaY2h4VndXZHU5RFVhIjtzOjIyOiJQSFBERUJVR0JBUl9TVEFDS19EQVRBIjthOjA6e319', 1760775634);
 
 -- --------------------------------------------------------
 
@@ -2964,7 +2987,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `user_type`, `name`, `email`, `mobile`, `address`, `profile_photo_path`, `landline`, `whatsapp`, `email_verified_at`, `password`, `two_factor_secret`, `two_factor_recovery_codes`, `two_factor_confirmed_at`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'Individual', 'Anjum Sohail', 'itdanjum@gmail.com', '923180224024', NULL, '/profile-photos/2974Anjum.jpg', NULL, NULL, NULL, '$2y$12$s3yEgQlhLDGt04WCT9EbbuTk0gmrncthrFGdFerUKZ8Npow2vARrm', NULL, NULL, NULL, 't9kaSDZwCepmgFWzRRFX6nu42Ml2QQvK9JcKQW3S6LCUuOeCAHXjIt059Ksh', '2025-08-14 05:01:26', '2025-09-25 22:26:33');
+(1, 'Business', 'Anjum Sohail', 'itdanjum@gmail.com', '923180224024', 'A-46, Rufi Homes, Near Safooa Chowrangi', 'profile-photos/hgM4a7kc0YSEjDlnIwP6pWBz9ZkSeRWq5jwnn4Ez.jpg', '02134646309', '92318022422', NULL, '$2y$12$p3gAmW8R.kFx1Y2L1YBITuigJ1d6aPKk3r7XbMd4ZchxVwWdu9DUa', NULL, NULL, NULL, 't9kaSDZwCepmgFWzRRFX6nu42Ml2QQvK9JcKQW3S6LCUuOeCAHXjIt059Ksh', '2025-08-14 05:01:26', '2025-10-18 03:10:31');
 
 --
 -- Indexes for dumped tables
@@ -3110,7 +3133,7 @@ ALTER TABLE `blocks`
 -- AUTO_INCREMENT for table `business_users`
 --
 ALTER TABLE `business_users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `cities`
@@ -3146,13 +3169,13 @@ ALTER TABLE `personal_access_tokens`
 -- AUTO_INCREMENT for table `property_advertisements`
 --
 ALTER TABLE `property_advertisements`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT for table `property_pictures`
 --
 ALTER TABLE `property_pictures`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `sectors`
