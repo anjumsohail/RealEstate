@@ -12,16 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('blocks', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('name');
-                    // OSM relation id (nullable, not necessarily unique — a city may share a relation sometimes)
-        $table->bigInteger('osm_relation_id')->nullable();
-        // Geometry column with SRID 4326
-        $table->geometry('boundary', 4326);
-        // Spatial index for efficient geo queries
-        $table->spatialIndex('boundary', 'blocks_geometry_spatial_index');
-            $table->foreignId('sector_id')->constrained()->onDelete('cascade');
+            $table->bigInteger('osm_relation_id');
+            $table->geometry('geometry');
+            $table->unsignedBigInteger('sector_id')->index('blocks_sector_id_foreign');
             $table->timestamps();
+
+            $table->spatialIndex(['geometry'], 'blocks_geometry_spatial_index');
         });
     }
 

@@ -12,16 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('cities', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('name')->unique();
+            $table->bigInteger('osm_relation_id');
+            $table->geometry('geometry');
             $table->timestamps();
-        // OSM relation id (nullable, not necessarily unique — a city may share a relation sometimes)
-        $table->bigInteger('osm_relation_id')->nullable();
-        // Geometry column with SRID 4326
-        $table->geometry('boundary', 4326);
-        // Spatial index for efficient geo queries
-        $table->spatialIndex('boundary', 'cities_geometry_spatial_index');
 
+            $table->spatialIndex(['geometry'], 'cities_geometry_spatial_index');
         });
     }
 
