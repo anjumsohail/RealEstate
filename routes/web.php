@@ -44,14 +44,13 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('blocks', BlockController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 
     Route::get('/user/view', [UserController::class, 'index'])->name('profile.view');
-    Route::get('/user/properties', [UserController::class, 'UserProperties'])->name('property.myproperties');
     Route::get('/user/edit', [UserController::class, 'edit'])->name('profile.edit');
     Route::patch('/user/{user}/update', [UserController::class, 'update'])->name('profile.update');
-
-
-
+    Route::get('/user/properties', [UserController::class, 'UserProperties'])->name('property.myproperties');
 
     Route::get('/property/add', [PropertyAdvertisementController::class, 'add'])->name('property.add');
+    Route::get('/property/edit/{id}', [PropertyAdvertisementController::class, 'edit'])->name('property.edit');
+
     Route::get('/property/MapSearch', [PropertyAdvertisementController::class, 'MapSearch'])->name('property.MapSearch');
 });
 

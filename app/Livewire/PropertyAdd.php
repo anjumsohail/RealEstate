@@ -33,10 +33,51 @@ class PropertyAdd extends Component
     public $postas;
     public $social;
     public $floor;
+    public $housetype;
     public $bedrooms;
     public $conscond;
     public $consage;
     public $propertyId;
+    public $mode;
+
+
+    public function mount($propertyId = null)
+    {
+
+        if ($propertyId) {
+            // Editing existing property
+            $this->mode = 'edit';
+            $this->propertyId = $propertyId;
+            $property = PropertyAdvertisement::findOrFail($this->propertyId);
+            // populate form fields
+            $this->purpose = $property->purpose;
+            $this->title = $property->title;
+            $this->description = $property->description;
+            $this->category = $property->category;
+            $this->proptype = $property->proptype;
+            $this->address = $property->address;
+            $this->city_id = $property->city_id;
+            $this->town_id = $property->town_id;
+            $this->sector_id = $property->sector_id;
+            $this->block_id = $property->block_id;
+            $this->latitude = $property->latitude;
+            $this->longitude = $property->longitude;
+            $this->area_size = $property->area_size;
+            $this->size_unit = $property->size_unit;
+            $this->positioning = $property->positioning;
+            $this->front_face = $property->front_face;
+            $this->back_site = $property->back_site;
+            $this->demand_price = $property->demand_price;
+            $this->pricetype = $property->pricetype;
+            $this->postas = $property->postas;
+            $this->social = $property->social;
+            $this->floor = $property->floor;
+            $this->housetype = $property->housetype;
+            $this->bedrooms = $property->bedrooms;
+            $this->conscond = $property->conscond;
+            $this->consage = $property->consage;
+        }
+    }
 
     // Listener to catch images forwarded from child
     protected $listeners = ['MapUpdated', 'geographySelected'];
@@ -102,6 +143,32 @@ class PropertyAdd extends Component
             $property = PropertyAdvertisement::create($data);
             $this->propertyId = $property->id;
             // ✅ Ask child to save pictures for this property
+
+            $this->dispatch('savePictures', propertyId: $this->propertyId)->to('property-images');
+        } catch (\Throwable $e) {
+            // ❌ Roll back everything
+            logger()->error('Transaction failed', ['error' => $e->getMessage()]);
+
+            session()->flash('error', 'Failed to save property. Please try again.');
+            return;
+        }
+    }
+
+    public function modify()
+    {
+        try {
+            // ✅ Validate input
+            if ($this->mode === 'edit') {
+                $property = PropertyAdvertisement::findOrFail($this->propertyId);
+                $property->update([
+                    'title' => $this->title,
+                    'purpose' => $this->purpose,
+                    'description' => $this->description,
+
+                ]);
+
+                session()->flash('success', 'Property updated successfully!');
+            }
 
             $this->dispatch('savePictures', propertyId: $this->propertyId)->to('property-images');
         } catch (\Throwable $e) {

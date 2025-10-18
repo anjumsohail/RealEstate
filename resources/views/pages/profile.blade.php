@@ -168,8 +168,8 @@
                                     <div class="mid_title"> Photograph <i class="fa fa-fw fa-image"></i></div>
                                     <div class="fileupload fileupload-new" data-provides="fileupload">
                                         <div class="fileupload-preview thumbnail" style="width: 200px; height: 150px;">
-                                            <x-img name="user[profile_photo1]" :path="$user->profile_photo_path" width="140"
-                                                height="140" class="img-rounded" alt="Profile Photo" />
+                                            <x-img name="user[profile_photo1]" :path="$user->profile_photo_path" width="100%"
+                                                height="140" class="img-fluid rounded mb-2" alt="Profile Photo" />
                                         </div>
                                         <div>
                                             <p><small>Max file size 500 kb</small></p>
@@ -476,8 +476,8 @@
 
 
                                                                 <x-img name="profile[logo]" :path="$user->businessProfile->logo"
-                                                                    width="140" height="140" class="img-rounded"
-                                                                    alt="Logo Photo" />
+                                                                    width="100%" height="140"
+                                                                    class="img-fluid rounded mb-2" alt="Logo Photo" />
 
                                                             </div>
 
@@ -515,8 +515,8 @@
 
 
                                                                 <x-img name="profile[vcard]" :path="$user->businessProfile->vcard"
-                                                                    width="140" height="140" class="img-rounded"
-                                                                    alt="Vcard Photo" />
+                                                                    width="100%" height="140"
+                                                                    class="img-fluid rounded mb-2" alt="Vcard Photo" />
                                                             </div>
 
                                                             <div>

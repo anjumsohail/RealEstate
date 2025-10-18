@@ -2,16 +2,21 @@
         <div class="container">
             <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6">
                 <div class="post-wrapper-heading">
-                    <i class="fa fa-fw fa-pencil-square-o"></i> Add Property for Sale
+                    <i class="fa fa-fw fa-pencil-square-o"></i>
+                    {{ $mode === 'edit' ? 'Edit Property' : 'Add New Property' }}
                 </div>
             </div>
         </div>
 
 
-        <form id="usrpropAdd" class="form-horizontal fv-form fv-form-bootstrap" wire:submit.prevent="save"
-            enctype="multipart/form-data" data-fv-framework="bootstrap" data-fv-icon-valid="glyphicon glyphicon-ok"
+        <form id="usrpropAdd" class="form-horizontal fv-form fv-form-bootstrap"
+            wire:submit.prevent="{{ $mode === 'edit' ? 'modify' : 'save' }}" enctype="multipart/form-data"
+            data-fv-framework="bootstrap" data-fv-icon-valid="glyphicon glyphicon-ok"
             data-fv-icon-invalid="glyphicon glyphicon-remove" data-fv-icon-validating="glyphicon glyphicon-refresh"
             method="post" novalidate="novalidate">
+            @if ($mode === 'edit')
+                @method('PUT')
+            @endif
             @csrf
             <section>
                 <div id="content" class="col-lg-12 col-md-10 col-sm-12 col-xs-12">
@@ -96,13 +101,15 @@
 
                                             <label id="ltype4" class="radio-inline">
                                                 <input type="radio" wire:model.live="proptype" id="proptype4"
-                                                    value="Portion" {{ old('proptype') == 'Portion' ? 'checked' : '' }}>
+                                                    value="Portion"
+                                                    {{ old('proptype') == 'Portion' ? 'checked' : '' }}>
                                                 Portion
                                             </label>
 
                                             <label id="ltype5" class="radio-inline">
                                                 <input type="radio" wire:model.live="proptype" id="proptype5"
-                                                    value="Cottage" {{ old('proptype') == 'Cottage' ? 'checked' : '' }}>
+                                                    value="Cottage"
+                                                    {{ old('proptype') == 'Cottage' ? 'checked' : '' }}>
                                                 Cottage
                                             </label>
                                         @endif
@@ -237,7 +244,7 @@
                             </div>
 
                             <!-- Selection Start -->
-                            @livewire('selection-component', ['columnClass' => 'col-md-12'])
+                            @livewire('selection-component', ['columnClass' => 'col-md-12', 'mode' => $this->mode, 'cityid' => $this->city_id, 'townid' => $this->town_id, 'sectorid' => $this->sector_id, 'blockid' => $this->block_id])
                             <!-- Selection End -->
 
                             <div class="mid_title">Property Features</div>
@@ -584,7 +591,18 @@
 
                         </div>
 
+
                         <div class="mid_title">Property Image</div>
+                        @if ($propertyId)
+                            <div class="boxes">
+                                <div class="fileupload fileupload-new">
+                                    <p> Uploaded Images of the Property
+                                    </p>
+                                    <livewire:show-photos :propertyId="$this->propertyId" />
+                                </div>
+                            </div>
+                        @endif
+
                         <div class="boxes">
                             <div class="fileupload fileupload-new" data-provides="fileupload">
                                 <p> Add image(s) to your property. Ads with image have greater visibility !
@@ -599,7 +617,13 @@
                             </div>
                         </div>
                         <div class="mid_title">Property Latitude / Longitude</div>
-                        @livewire('map-picker')
+
+                        @if ($propertyId)
+                            <livewire:map-picker :latitude="$this->latitude" :longitude="$this->longitude" />
+                        @else
+                            <livewire:map-picker />
+                        @endif
+
 
                         <div class="mid_title">Seller Details</div>
                         <div class="control-group form-group">
@@ -659,9 +683,9 @@
                             </div>
                         @endif
                         <div class="btn-group" role="group" aria-label="...">
-                            <button type="submit" class="btn-system border-btn btn-small btn-green">Submit
-                                New
-                                Property</button>
+                            <button type="submit" class="btn-system border-btn btn-small btn-green">
+                                {{ $mode === 'edit' ? 'Update Property' : 'Submit New Property' }}
+                            </button>
 
                         </div>
                     </div>

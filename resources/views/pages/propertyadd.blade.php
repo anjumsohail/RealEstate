@@ -1,5 +1,5 @@
 @extends('layouts.main')
 
 @section('content')
-    <livewire:propertyadd />
+    <livewire:propertyadd :mode="$mode" :propertyId="$propertyid" />
 @endsection

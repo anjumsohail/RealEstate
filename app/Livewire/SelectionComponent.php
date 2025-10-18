@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 class SelectionComponent extends Component
 {
     public $columnClass = 'col-md-10';
+
     public $selectedCity = null;
     public $selectedTown = null;
     public $selectedSector = null;
@@ -25,10 +26,19 @@ class SelectionComponent extends Component
 
     public $properties = [];
 
-    public function mount()
+    public function mount($mode = '', $cityid = '', $townid = '', $sectorid = '', $blockid = '')
     {
         // Load cities at the start
         $this->cities = City::orderBy('name')->get();
+        if ($mode == 'edit') {
+            $this->selectedCity = $cityid;
+            $this->updatedSelectedCity($cityid);
+            $this->selectedTown = $townid;
+            $this->updatedSelectedTown($townid);
+            $this->selectedSector = $sectorid;
+            $this->updatedSelectedSector($sectorid);
+            $this->selectedBlock = $blockid;
+        }
     }
 
     public function updatedSelectedCity($value)

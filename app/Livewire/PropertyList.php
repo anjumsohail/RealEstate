@@ -29,8 +29,9 @@ class PropertyList extends Component
 
     public function render()
     {
-
-        $properties = PropertyAdvertisement::whereIn('id', $this->listData)->paginate(4); // Or re-query as needed
+        $properties = PropertyAdvertisement::where('approved', true)
+            ->whereIn('id', $this->listData)
+            ->paginate(15);
         return view('livewire.property-list', [
             'properties' => $properties,
             'propertyCount' => $properties->total(),

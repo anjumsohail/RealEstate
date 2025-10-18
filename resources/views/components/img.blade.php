@@ -1,2 +1,2 @@
 <img name="{{ $name }}" src="{{ $src }}" class="{{ $class }}"
-    style="width: {{ $width }}px; height: {{ $height }}px;" alt="{{ $alt }}">
+    style="width: {{ $width }}; height: {{ $height }}px;object-fit: cover;" alt="{{ $alt }}">

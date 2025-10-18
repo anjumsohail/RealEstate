@@ -21,6 +21,7 @@ return new class extends Migration
             $table->enum('category', ['Residential', 'Commercial']);
             $table->enum('proptype', ['Plot', 'Home', 'Apartment', 'Portion', 'Cottage']);
             $table->boolean('featured')->default(false);
+            $table->boolean('approved')->default(false);
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('address')->nullable();

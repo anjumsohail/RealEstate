@@ -26,7 +26,20 @@ class PropertyAdvertisementController extends Controller
 
     public function add()
     {
-        return view('pages.propertyadd');
+        // Just load an empty form
+        return view('pages.propertyadd', [
+            'propertyid' => null, // or new PropertyAdvertisement()
+            'mode' => 'add',
+        ]);
+    }
+
+    public function edit($id)
+    {
+
+        return view('pages.propertyadd', [
+            'propertyid' => $id,
+            'mode' => 'edit',
+        ]);
     }
 
     public function MapSearch()
