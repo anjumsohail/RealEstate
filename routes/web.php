@@ -49,7 +49,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/user/properties', [UserController::class, 'UserProperties'])->name('property.myproperties');
 
     Route::get('/property/add', [PropertyAdvertisementController::class, 'add'])->name('property.add');
-    Route::get('/property/edit/{id}', [PropertyAdvertisementController::class, 'edit'])->name('property.edit');
+    Route::get('/property/{propertyid}/edit', [PropertyAdvertisementController::class, 'edit'])->name('property.edit');
 
     Route::get('/property/MapSearch', [PropertyAdvertisementController::class, 'MapSearch'])->name('property.MapSearch');
 });

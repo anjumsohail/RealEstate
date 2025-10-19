@@ -20,8 +20,10 @@
                             <li style="display: inline-block;"><a href="{{ route('profile.view') }}"
                                     class="btn-system btn-medium border-btn btn-green active">My Profile </a></li>
 
-                            <li><a href="{{ route('property.myproperties') }}"
-                                    class="btn-system btn-medium border-btn btn-green">My Properties </a></li>
+                            <li><a href="{{ $user->properties->count() > 0 ? route('property.myproperties') : '' }}"
+                                    class="btn-system btn-medium border-btn btn-green">
+                                    My Properties
+                                </a></li>
 
                         </ul>
                     </div>
@@ -38,8 +40,10 @@
                             <!-- Start Call Action -->
                             <div class="boxes clearfix">
                                 <!-- Service Information Column -->
-                                <h3 class="title"><i class="fa fa-fw fa-user"></i> <b>Personal Information</b> <span
-                                        class="pull-right">Register as : <b>{{ $user->user_type ?: 'Guest' }}</b> </span>
+                                <h3 class="title"><i class="fa fa-fw fa-user"></i> <b>Personal
+                                        Information</b> <span class="pull-right">Register as
+                                        :
+                                        <b>{{ $user->user_type ?: 'Guest' }}</b> </span>
                                 </h3>
                                 <div class="control-group form-group">
                                     <div class="controls text-center">

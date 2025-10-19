@@ -25,7 +25,7 @@ class UserController extends Controller
     {
         //$query = User::with(['businessProfile', 'properties']);
         if (Auth::user()->role !== 'Admin') {
-            $user = User::with(['businessProfile', 'properties'])->findOrFail(Auth::id());
+            $user = User::with(['businessProfile'])->findOrFail(Auth::id());
         }
         //dd($user->businessProfile);
         return view('pages.user', compact('user'));
@@ -35,6 +35,7 @@ class UserController extends Controller
     {
         //if (Auth::user()->role !== 'Admin') {
         //            $user = User::with(['businessProfile', 'properties'])->findOrFail(Auth::id());        }
+
         return view('pages.userproperties');
     }
 
