@@ -21,8 +21,8 @@ class PropertyAdd extends Component
     public $town_id;
     public $sector_id;
     public $block_id;
-    public $latitude;
-    public $longitude;
+    public $latitude = 24.935636;
+    public $longitude = 67.136576;
     public $area_size;
     public $size_unit;
     public $positioning;
@@ -43,12 +43,18 @@ class PropertyAdd extends Component
 
     public function mount($propertyId = null)
     {
-
         if ($propertyId) {
+            $property = PropertyAdvertisement::findOrFail($this->propertyId);
+
+            if (Auth::user()->role !== 'Admin' && Auth::id() !== $property->user_id) {
+                abort(403, 'Unauthorized');
+            }
+
+
             // Editing existing property
             $this->mode = 'edit';
             $this->propertyId = $propertyId;
-            $property = PropertyAdvertisement::findOrFail($this->propertyId);
+
             // populate form fields
             $this->purpose = $property->purpose;
             $this->title = $property->title;

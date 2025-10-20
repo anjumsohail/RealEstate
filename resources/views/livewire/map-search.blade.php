@@ -112,29 +112,37 @@
 
     </div>
 </div>
+@assets
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+@endassets
 
-@push('scripts')
+@script
     <script>
-        document.addEventListener('livewire:init', () => {
-            const mapDiv = document.getElementById('map');
-            if (!mapDiv) return;
+        let map, drawnItems, markerLayer;
 
-            // Default coordinates if nothing drawn
-            let lat = parseFloat(document.getElementById('latitude').value) || 24.9480;
-            let lng = parseFloat(document.getElementById('longitude').value) || 67.1541;
+        // Initialize when component is ready
+        Alpine.nextTick(() => {
+            console.log('Initializing map with Alpine...');
 
-            // 🔹 Initialize Leaflet map
-            const map = L.map('map').setView([lat, lng], 13);
+            // Default coordinates
+            const lat = $wire.latitude || 24.9480;
+            const lng = $wire.longitude || 67.1541;
+
+            // Initialize Leaflet map
+            map = L.map('map').setView([lat, lng], 13);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap contributors'
             }).addTo(map);
 
-            // 🔹 Layers for shapes & markers
-            const drawnItems = new L.FeatureGroup().addTo(map);
-            const markerLayer = new L.LayerGroup().addTo(map);
+            // Layers for shapes & markers
+            drawnItems = new L.FeatureGroup().addTo(map);
+            markerLayer = new L.LayerGroup().addTo(map);
 
-            // 🔹 Draw controls (circle only)
+            // Draw controls (circle only)
             const drawControl = new L.Control.Draw({
                 draw: {
                     polygon: false,
@@ -150,46 +158,46 @@
             });
             map.addControl(drawControl);
 
-            function updateInputs(lat, lng, radius = null) {
-                document.getElementById('latitude').value = lat;
-                document.getElementById('longitude').value = lng;
-                document.getElementById('radius').value = radius || '';
-                const component = Livewire.find(mapDiv.closest('[wire\\:id]').getAttribute('wire:id'));
-                component.set('latitude', lat);
-                component.set('longitude', lng);
-                component.set('radius', radius);
-            }
-
-            // 🔹 Circle creation and edit
+            // Circle creation event
             map.on(L.Draw.Event.CREATED, function(e) {
                 drawnItems.clearLayers();
                 const layer = e.layer;
                 drawnItems.addLayer(layer);
                 const center = layer.getLatLng();
                 const radiusKm = (layer.getRadius() / 1000).toFixed(2);
-                updateInputs(center.lat, center.lng, radiusKm);
+
+                // Update Livewire properties
+                $wire.set('latitude', center.lat);
+                $wire.set('longitude', center.lng);
+                $wire.set('radius', radiusKm);
             });
 
+            // Circle edit event
             map.on(L.Draw.Event.EDITED, function(e) {
                 e.layers.eachLayer(layer => {
                     const center = layer.getLatLng();
                     const radiusKm = (layer.getRadius() / 1000).toFixed(2);
-                    updateInputs(center.lat, center.lng, radiusKm);
+
+                    $wire.set('latitude', center.lat);
+                    $wire.set('longitude', center.lng);
+                    $wire.set('radius', radiusKm);
                 });
             });
 
-            // 🔹 Reset
-            document.getElementById('resetCircle').addEventListener('click', function() {
-                drawnItems.clearLayers();
-                markerLayer.clearLayers();
-                const component = Livewire.find(mapDiv.closest('[wire\\:id]').getAttribute('wire:id'));
-                component.set('latitude', null);
-                component.set('longitude', null);
-                component.set('radius', null);
-            });
+            // Listen for reset button click
+            const resetBtn = document.getElementById('resetCircle');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function() {
+                    drawnItems.clearLayers();
+                    markerLayer.clearLayers();
+                    $wire.set('latitude', null);
+                    $wire.set('longitude', null);
+                    $wire.set('radius', null);
+                });
+            }
 
-            // ✅ Listen for backend dispatch event
-            Livewire.on('mapDataUpdated', (data) => {
+            // Listen for backend data updates
+            $wire.on('mapDataUpdated', (data) => {
                 console.log('mapDataUpdated received:', data);
 
                 // If data is [[...]], unwrap the inner array
@@ -212,30 +220,27 @@
 
                     const marker = L.marker([lat, lng]).addTo(markerLayer);
                     marker.bindPopup(`
-            <div style="width:200px;">
-                <strong>${item.title}</strong><br>
-                Purpose: ${item.purpose}<br>
-                Type: ${item.proptype}<br>
-                <a href="javascript:void(0)" onclick="window.showPropertyDetail(${item.id})" class="btn btn-sm btn-primary mt-1">View Details</a>
-            </div>
-        `);
+                    <div style="width:200px;">
+                        <strong>${item.title}</strong><br>
+                        Purpose: ${item.purpose}<br>
+                        Type: ${item.proptype}<br>
+                        <a href="javascript:void(0)" onclick="window.showPropertyDetail(${item.id})"
+                            class="btn btn-sm btn-primary mt-1">View Details</a>
+                    </div>
+                `);
                 });
 
                 const bounds = L.latLngBounds(points.map(p => [parseFloat(p.latitude), parseFloat(p
                     .longitude)]));
                 map.fitBounds(bounds);
             });
-
-            // End Livewire On Event
-
-
-
         });
-        // Add this global function
+
+        // Global function for property details
         window.showPropertyDetail = function(propertyId) {
-            Livewire.dispatch('showPropertyDetail', {
+            $wire.dispatch('showPropertyDetail', {
                 propertyId: propertyId
             });
         };
     </script>
-@endpush
+@endscript

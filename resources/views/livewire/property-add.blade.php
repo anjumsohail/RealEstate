@@ -618,11 +618,8 @@
                         </div>
                         <div class="mid_title">Property Latitude / Longitude</div>
 
-                        @if ($propertyId)
-                            <livewire:map-picker :latitude="$this->latitude" :longitude="$this->longitude" />
-                        @else
-                            <livewire:map-picker />
-                        @endif
+                        <livewire:map-picker :latitude="$latitude" :longitude="$longitude" />
+
 
 
                         <div class="mid_title">Seller Details</div>

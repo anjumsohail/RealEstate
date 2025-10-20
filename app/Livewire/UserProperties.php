@@ -81,6 +81,12 @@ class UserProperties extends Component
 
     public function deleteProperty(PropertyAdvertisement $propertyAdvertisement)
     {
+
+        if (Auth::user()->role !== 'Admin' && Auth::id() !== $propertyAdvertisement->user_id) {
+            abort(403, 'Unauthorized');
+        }
+
+
         $propertyAdvertisement->delete();
     }
 

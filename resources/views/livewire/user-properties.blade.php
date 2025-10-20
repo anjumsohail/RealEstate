@@ -147,14 +147,21 @@
                                           <td>{{ $property->address }}</th>
                                           <td>{{ $property->demand_price }}</th>
 
-                                          <td>
+                                          <td class="d-inline-flex">
                                               <button wire:click="showDetail({{ $property->id }})"
                                                   class="btn btn-xs btn-system border-btn btn-green"
                                                   title="View Property"><i class="fa fa-search"></i></button>
-                                              <a href="{{ route('property.edit', ['propertyid' => $property->id]) }}"
-                                                  class="btn " title="Edit Property"><i
-                                                      class="fa fa-pencil-square-o"></i></a>
-                                              <button wire:click="deleteProperty({{ $property->id }})"
+
+                                              <form action="{{ route('property.edit') }}" method="POST"
+                                                  style="display:inline;">
+                                                  @csrf
+                                                  <input type="hidden" name="property_id"
+                                                      value="{{ $property->id }}">
+                                                  <button type="submit" class="btn btn-primary"><i
+                                                          class="fa fa-pencil-square-o"></i></button>
+                                              </form>
+                                              <button class="btn btn-danger"
+                                                  wire:click="deleteProperty({{ $property->id }})"
                                                   wire:confirm="Are you sure you want to delete this post?"
                                                   class="btn " title="Delete Property"><i
                                                       class="fa fa-times-circle-o"></i></button>

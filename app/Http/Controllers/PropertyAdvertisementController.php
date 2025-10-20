@@ -33,11 +33,12 @@ class PropertyAdvertisementController extends Controller
         ]);
     }
 
-    public function edit($id)
+    public function edit(Request $request)
     {
 
+        $propertyId = $request->input('property_id');
         return view('pages.propertyadd', [
-            'propertyid' => $id,
+            'propertyid' => $propertyId,
             'mode' => 'edit',
         ]);
     }

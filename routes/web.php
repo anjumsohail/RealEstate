@@ -8,6 +8,7 @@ use App\Http\Controllers\TownController;
 use App\Http\Controllers\SectorController;
 use App\Http\Controllers\BlockController;
 use App\Http\Controllers\UserController;
+use App\Livewire\PropertyDetail;
 
 
 Route::get('/', function () {
@@ -49,16 +50,18 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/user/properties', [UserController::class, 'UserProperties'])->name('property.myproperties');
 
     Route::get('/property/add', [PropertyAdvertisementController::class, 'add'])->name('property.add');
-    Route::get('/property/{propertyid}/edit', [PropertyAdvertisementController::class, 'edit'])->name('property.edit');
+    Route::post('/property/edit', [PropertyAdvertisementController::class, 'edit'])->name('property.edit');
+    Route::get('/property/{propertyid}/edit', [PropertyAdvertisementController::class, 'edit'])->name('property.edit2');
 
     Route::get('/property/MapSearch', [PropertyAdvertisementController::class, 'MapSearch'])->name('property.MapSearch');
 });
 
 // ✅ Search properties - accessible to any user (guest or authenticated)
-Route::get('/property-advertisements/search', [PropertyAdvertisementController::class, 'search'])
-    ->name('property-advertisements.search');
+
 Route::get('/property-advertisements/view/{id}', [PropertyAdvertisementController::class, 'view'])
     ->name('property-advertisements.view');
+Route::get('/property/{id}', PropertyDetail::class)->name('property.detail');
+
 
 
 require __DIR__ . '/auth.php';
